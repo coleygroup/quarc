@@ -1,0 +1,50 @@
+base_model_dir: "./trained_models"
+
+models:
+  agent:
+    checkpoint_path: "agent/gnn_agent_model.ckpt"
+    model_class: "AgentGNNWithReactionClass"
+    model_type: "gnn"
+    params:
+      gnn_depth: 2
+      graph_input_dim: 1024
+      hidden_dim: 2048
+      n_blocks: 3
+      output_dim: 1376
+      agent_input_dim: 1376
+
+  temperature:
+    checkpoint_path: "temperature/gnn_temperature_model.ckpt"
+    model_class: "TemperatureGNN"
+    model_type: "gnn"
+    params:
+      gnn_depth: 6
+      graph_input_dim: 768
+      hidden_dim: 2048
+      n_blocks: 3
+      output_dim: 32
+      agent_input_dim: 1376
+
+  reactant_amount:
+    checkpoint_path: "reactant_amount/gnn_reactant_amount_model.ckpt"
+    model_class: "ReactantAmountGNN"
+    model_type: "gnn"
+    params:
+      gnn_depth: 3
+      graph_input_dim: 512
+      hidden_dim: 2048
+      n_blocks: 3
+      output_dim: 15
+      agent_input_dim: 1376
+
+  agent_amount:
+    checkpoint_path: "agent_amount/gnn_agent_amount_model.ckpt"
+    model_class: "AgentAmountOneshotGNN"
+    model_type: "gnn"
+    params:
+      gnn_depth: 4
+      graph_input_dim: 512
+      hidden_dim: 2048
+      n_blocks: 3
+      output_dim: 27
+      agent_input_dim: 1376

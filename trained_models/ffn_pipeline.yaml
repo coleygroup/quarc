@@ -1,0 +1,48 @@
+base_model_dir: "./trained_models"
+
+models:
+  agent:
+    checkpoint_path: "agent/ffn_agent_model.ckpt"
+    model_class: "AgentFFNWithReactionClass"
+    model_type: "ffn"
+    params:
+      fp_dim: 2048
+      agent_input_dim: 1376
+      output_dim: 1376
+      hidden_dim: 2048
+      n_blocks: 3
+
+  temperature:
+    checkpoint_path: "temperature/ffn_temperature_model.ckpt"
+    model_class: "TemperatureFFN"
+    model_type: "ffn"
+    params:
+      fp_dim: 2048
+      agent_input_dim: 1376
+      output_dim: 32
+      hidden_dim: 2048
+      n_blocks: 6
+
+  reactant_amount:
+    checkpoint_path: "reactant_amount/ffn_reactant_amount_model.ckpt"
+    model_class: "ReactantAmountFFN"
+    model_type: "ffn"
+    params:
+      fp_dim: 2048
+      agent_input_dim: 1376
+      output_dim: 15
+      hidden_dim: 2048
+      n_blocks: 2
+      activation: "ReLU"
+
+  agent_amount:
+    checkpoint_path: "agent_amount/ffn_agent_amount_model.ckpt"
+    model_class: "AgentAmountFFN"
+    model_type: "ffn"
+    params: # FFN HPO 56d82706
+      fp_dim: 2048
+      agent_input_dim: 1376
+      output_dim: 27
+      hidden_dim: 2048
+      n_blocks: 3
+      activation: "ReLU"

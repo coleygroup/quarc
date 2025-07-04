@@ -25,7 +25,7 @@ LOG_DIR = PROJ_ROOT / "logs"
 
 # Pistachio's density path
 DEFAULT_RXN_CLASS_PATH = DATA_DIR / "Pistachio Reaction Types.csv"
-DEFAULT_DENSITY_PATH = PROCESSED_DATA_DIR / "densities_clean_new.tsv"
+DEFAULT_DENSITY_PATH = DATA_DIR / "densities_clean_new.tsv"
 
 # Notifications
 SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")

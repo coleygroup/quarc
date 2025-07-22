@@ -36,7 +36,9 @@ from rdkit import RDLogger
 from tqdm import tqdm
 
 from quarc.data.datapoints import ReactionDatum
-from quarc.quarc.utils.smiles_utils import COMMON_SOLVENTS_CANONICAL
+from quarc.utils.smiles_utils import get_common_solvents_canonical
+
+COMMON_SOLVENTS_CANONICAL = get_common_solvents_canonical()
 
 RDLogger.DisableLog("rdApp.*")
 # Filters: True -> keep, False -> skip

@@ -1,12 +1,10 @@
-# Adapted from chemprop v2's legacy arguments
+# Adapted from chemprop v1's legacy TrainArgs class
 
-
-import numpy as np
 from typing_extensions import Literal
 from tap import Tap
 
 
-class TrainArgs_simple(Tap):
+class TrainArgs(Tap):
     stage: int = 1
     """Stage of the training."""
     no_cuda: bool = False
@@ -31,7 +29,6 @@ class TrainArgs_simple(Tap):
     """Path to model checkpoint (:code:`.pt` file)."""
     checkpoint_paths: list[str] = None
     """List of paths to model checkpoints (:code:`.pt` files)."""
-
 
     # Model Args
     # Graph
@@ -80,7 +77,7 @@ class TrainArgs_simple(Tap):
     """Final learning rate."""
 
     def __init__(self, *args, **kwargs) -> None:
-        super(TrainArgs_simple, self).__init__(*args, **kwargs)
+        super(TrainArgs, self).__init__(*args, **kwargs)
         self._task_names = None
         self._crossval_index_sets = None
         self._num_tasks = None

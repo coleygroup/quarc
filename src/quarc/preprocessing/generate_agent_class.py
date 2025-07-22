@@ -4,8 +4,11 @@ import os
 from collections import Counter
 
 import pandas as pd
-from quarc.quarc.utils.smiles_utils import COMMON_SOLVENTS_CANONICAL
 from loguru import logger
+
+from quarc.utils.smiles_utils import get_common_solvents_canonical
+
+COMMON_SOLVENTS_CANONICAL = get_common_solvents_canonical()
 
 INVALID_SMILES = [
     "null",
@@ -33,6 +36,7 @@ def count_agent_distribution(config) -> Counter:
 
     return agent_distribution
 
+
 def generate_agent_class(config):
     """Generate agent class. Config file contains the list of elements needed to be saved to others, minocc
 
@@ -48,7 +52,7 @@ def generate_agent_class(config):
 
     agent_distribution = count_agent_distribution(config)
 
-    conv_rules_path = os.path.join(os.path.dirname(__file__),'../utils/agent_rules_v1.json')
+    conv_rules_path = os.path.join(os.path.dirname(__file__), "../utils/agent_rules_v1.json")
     # load conv_rules
     with open(conv_rules_path, "r") as f:
         conv_rules = json.load(f)

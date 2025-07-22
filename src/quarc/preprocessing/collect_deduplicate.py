@@ -23,7 +23,7 @@ from quarc.preprocessing.preprocess_quantities import (
     process_simple,
 )
 from quarc.preprocessing.text_parser import parse_temperature
-from quarc.quarc.utils.smiles_utils import (
+from quarc.utils.smiles_utils import (
     canonicalize_smiles,
     is_atom_map_rxn_smiles,
     remove_stereo,

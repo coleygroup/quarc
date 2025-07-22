@@ -14,7 +14,9 @@ from quarc.data.datapoints import AgentRecord, ReactionDatum
 from quarc.models.modules.agent_encoder import AgentEncoder
 from quarc.models.modules.agent_standardizer import AgentStandardizer
 from quarc.models.modules.rxn_encoder import ReactionClassEncoder
-from quarc.config import DEFAULT_RXN_CLASS_PATH
+from quarc.settings import load as load_settings
+
+cfg = load_settings()
 
 RDLogger.DisableLog("rdApp.*")
 
@@ -107,7 +109,6 @@ class AugmentedAgentsDataset(Dataset):
         self.sample_weighting = sample_weighting
 
         self.index_mapping = self._create_index_mapping()
-
 
     def _create_index_mapping(self):
         """Create mapping between original index and augmented index.
@@ -221,6 +222,7 @@ class AgentsDatasetWithReactionClass(ReactionDatasetBase):
         data: list[ReactionDatum],
         agent_standardizer: AgentStandardizer,
         agent_encoder: AgentEncoder,
+        rxn_encoder: ReactionClassEncoder,
         fp_radius: int = 3,
         fp_length: int = 2048,
     ):
@@ -235,7 +237,7 @@ class AgentsDatasetWithReactionClass(ReactionDatasetBase):
         """
 
         super().__init__(data, agent_standardizer, agent_encoder, fp_radius, fp_length)
-        self.rxn_encoder = ReactionClassEncoder(class_path=DEFAULT_RXN_CLASS_PATH)
+        self.rxn_encoder = rxn_encoder
 
     def __getitem__(self, idx):
         """Get item from index mapping.

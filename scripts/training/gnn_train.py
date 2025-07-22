@@ -19,15 +19,7 @@ from lightning.pytorch.utilities.rank_zero import rank_zero_only
 from torchmetrics.classification import Accuracy
 from torcheval.metrics.functional import multilabel_accuracy
 
-from quarc.cli.train_args import TrainArgs_simple
-from quarc.config import (
-    PROCESSED_DATA_DIR,
-    MODELS_DIR,
-    STAGE1_DIR,
-    STAGE2_DIR,
-    STAGE3_DIR,
-    STAGE4_DIR,
-)
+from quarc.cli.train_args import TrainArgs
 from quarc.data.gnn_datasets import (
     AugmentedAgentReactionDatasetWithReactionClass,
     AgentReactionDatasetWithReactionClass,
@@ -52,6 +44,9 @@ from quarc.models.callbacks import GNNGreedySearchCallback
 from quarc.data.gnn_dataloader import build_dataloader_agent
 from quarc.models.modules.agent_encoder import AgentEncoder
 from quarc.models.modules.agent_standardizer import AgentStandardizer
+from quarc.settings import load as load_settings
+
+cfg = load_settings()
 
 torch.set_float32_matmul_precision("medium")
 
@@ -67,7 +62,7 @@ def log_args(args, tb_path):
 
 
 # Stage 1: Agent (with reaction class)
-def train_stage_1_model_with_reaction_class(args: TrainArgs_simple):
+def train_stage_1_model_with_reaction_class(args: TrainArgs):
     pl.seed_everything(args.seed, workers=True)
 
     local_rank = int(os.environ.get("LOCAL_RANK", 0))
@@ -81,7 +76,7 @@ def train_stage_1_model_with_reaction_class(args: TrainArgs_simple):
         )
     torch.cuda.set_device(local_rank)
 
-    save_dir = MODELS_DIR / "GNN" / f"stage{args.stage}_rxnclass"
+    save_dir = cfg.models_dir / "GNN" / f"stage{args.stage}_rxnclass"
     save_dir.mkdir(parents=True, exist_ok=True)
     if local_rank == 0:
         tb_logger = pl_loggers.TensorBoardLogger(save_dir=save_dir, name=args.logger_name)
@@ -91,13 +86,15 @@ def train_stage_1_model_with_reaction_class(args: TrainArgs_simple):
         tb_logger = pl_loggers.TensorBoardLogger(save_dir=save_dir, name=args.logger_name)
         tb_path = tb_logger.log_dir
 
-    a_enc = AgentEncoder(class_path=PROCESSED_DATA_DIR / "agent_encoder/agent_encoder_list.json")
-    a_standardizer = AgentStandardizer(
-        conv_rules=PROCESSED_DATA_DIR / "agent_encoder/agent_rules_v1.json",
-        other_dict=PROCESSED_DATA_DIR / "agent_encoder/agent_other_dict.json",
+    a_enc = AgentEncoder(
+        class_path=cfg.processed_data_dir / "agent_encoder/agent_encoder_list.json"
     )
-    train_data_path = STAGE1_DIR / "stage1_train.pickle"
-    val_data_path = STAGE1_DIR / "stage1_val.pickle"
+    a_standardizer = AgentStandardizer(
+        conv_rules=cfg.processed_data_dir / "agent_encoder/agent_rules_v1.json",
+        other_dict=cfg.processed_data_dir / "agent_encoder/agent_other_dict.json",
+    )
+    train_data_path = cfg.processed_data_dir / "stage1" / "stage1_train.pickle"
+    val_data_path = cfg.processed_data_dir / "stage1" / "stage1_val.pickle"
 
     with open(train_data_path, "rb") as f:
         train_data = pickle.load(f)
@@ -226,7 +223,7 @@ def train_stage_1_model_with_reaction_class(args: TrainArgs_simple):
 
 
 # Stage 2: Temperature amount
-def train_stage_2_model(args: TrainArgs_simple):
+def train_stage_2_model(args: TrainArgs):
     pl.seed_everything(args.seed, workers=True)
 
     local_rank = int(os.environ.get("LOCAL_RANK", 0))
@@ -240,7 +237,7 @@ def train_stage_2_model(args: TrainArgs_simple):
             rank=local_rank,
         )
 
-    save_dir = MODELS_DIR / "GNN" / f"stage{args.stage}"
+    save_dir = cfg.models_dir / "GNN" / f"stage{args.stage}"
     save_dir.mkdir(parents=True, exist_ok=True)
     if local_rank == 0:
         tb_logger = pl_loggers.TensorBoardLogger(save_dir=save_dir, name=args.logger_name)
@@ -251,15 +248,17 @@ def train_stage_2_model(args: TrainArgs_simple):
         tb_path = tb_logger.log_dir
 
     # * New agent encoder used
-    a_enc = AgentEncoder(class_path=PROCESSED_DATA_DIR / "agent_encoder/agent_encoder_list.json")
-
-    a_standardizer = AgentStandardizer(
-        conv_rules=PROCESSED_DATA_DIR / "agent_encoder/agent_rules_v1.json",
-        other_dict=PROCESSED_DATA_DIR / "agent_encoder/agent_other_dict.json",
+    a_enc = AgentEncoder(
+        class_path=cfg.processed_data_dir / "agent_encoder/agent_encoder_list.json"
     )
 
-    train_data_path = STAGE2_DIR / "stage2_train.pickle"
-    val_data_path = STAGE2_DIR / "stage2_val.pickle"
+    a_standardizer = AgentStandardizer(
+        conv_rules=cfg.processed_data_dir / "agent_encoder/agent_rules_v1.json",
+        other_dict=cfg.processed_data_dir / "agent_encoder/agent_other_dict.json",
+    )
+
+    train_data_path = cfg.processed_data_dir / "stage2" / "stage2_train.pickle"
+    val_data_path = cfg.processed_data_dir / "stage2" / "stage2_val.pickle"
 
     with open(train_data_path, "rb") as f:
         train_data = pickle.load(f)
@@ -384,7 +383,7 @@ def train_stage_2_model(args: TrainArgs_simple):
 
 
 # Stage 3: Reactant amount
-def train_stage_3_model(args: TrainArgs_simple):
+def train_stage_3_model(args: TrainArgs):
     pl.seed_everything(args.seed, workers=True)
 
     local_rank = int(os.environ.get("LOCAL_RANK", 0))
@@ -397,7 +396,7 @@ def train_stage_3_model(args: TrainArgs_simple):
             rank=local_rank,
         )
 
-    save_dir = MODELS_DIR / "GNN" / f"stage{args.stage}"
+    save_dir = cfg.models_dir / "GNN" / f"stage{args.stage}"
     save_dir.mkdir(parents=True, exist_ok=True)
     if local_rank == 0:
         tb_logger = pl_loggers.TensorBoardLogger(save_dir=save_dir, name=args.logger_name)
@@ -408,15 +407,17 @@ def train_stage_3_model(args: TrainArgs_simple):
         tb_path = tb_logger.log_dir
 
     # Setup encoders and standardizers
-    a_enc = AgentEncoder(class_path=PROCESSED_DATA_DIR / "agent_encoder/agent_encoder_list.json")
+    a_enc = AgentEncoder(
+        class_path=cfg.processed_data_dir / "agent_encoder/agent_encoder_list.json"
+    )
     a_standardizer = AgentStandardizer(
-        conv_rules=PROCESSED_DATA_DIR / "agent_encoder/agent_rules_v1.json",
-        other_dict=PROCESSED_DATA_DIR / "agent_encoder/agent_other_dict.json",
+        conv_rules=cfg.processed_data_dir / "agent_encoder/agent_rules_v1.json",
+        other_dict=cfg.processed_data_dir / "agent_encoder/agent_other_dict.json",
     )
 
     # Load and validate data
-    train_data_path = STAGE3_DIR / "stage3_train.pickle"
-    val_data_path = STAGE3_DIR / "stage3_val.pickle"
+    train_data_path = cfg.processed_data_dir / "stage3" / "stage3_train.pickle"
+    val_data_path = cfg.processed_data_dir / "stage3" / "stage3_val.pickle"
 
     with open(train_data_path, "rb") as f:
         train_data = pickle.load(f)
@@ -545,7 +546,7 @@ def train_stage_3_model(args: TrainArgs_simple):
 
 
 # Stage 4: Agent amount
-def train_stage_4_model_oneshot(args: TrainArgs_simple):
+def train_stage_4_model_oneshot(args: TrainArgs):
     pl.seed_everything(args.seed, workers=True)
 
     local_rank = int(os.environ.get("LOCAL_RANK", 0))
@@ -557,7 +558,7 @@ def train_stage_4_model_oneshot(args: TrainArgs_simple):
             world_size=world_size,
             rank=local_rank,
         )
-    save_dir = MODELS_DIR / "GNN" / f"stage{args.stage}"
+    save_dir = cfg.models_dir / "GNN" / f"stage{args.stage}"
     save_dir.mkdir(parents=True, exist_ok=True)
     if local_rank == 0:
         tb_logger = pl_loggers.TensorBoardLogger(save_dir=save_dir, name=args.logger_name)
@@ -568,15 +569,17 @@ def train_stage_4_model_oneshot(args: TrainArgs_simple):
         tb_path = tb_logger.log_dir
 
     # Setup encoders and standardizers
-    a_enc = AgentEncoder(class_path=PROCESSED_DATA_DIR / "agent_encoder/agent_encoder_list.json")
+    a_enc = AgentEncoder(
+        class_path=cfg.processed_data_dir / "agent_encoder/agent_encoder_list.json"
+    )
     a_standardizer = AgentStandardizer(
-        conv_rules=PROCESSED_DATA_DIR / "agent_encoder/agent_rules_v1.json",
-        other_dict=PROCESSED_DATA_DIR / "agent_encoder/agent_other_dict.json",
+        conv_rules=cfg.processed_data_dir / "agent_encoder/agent_rules_v1.json",
+        other_dict=cfg.processed_data_dir / "agent_encoder/agent_other_dict.json",
     )
 
     # Load and validate data
-    train_data_path = STAGE4_DIR / "stage4_train.pickle"
-    val_data_path = STAGE4_DIR / "stage4_val.pickle"
+    train_data_path = cfg.processed_data_dir / "stage4" / "stage4_train.pickle"
+    val_data_path = cfg.processed_data_dir / "stage4" / "stage4_val.pickle"
 
     with open(train_data_path, "rb") as f:
         train_data = pickle.load(f)
@@ -703,9 +706,7 @@ def train_stage_4_model_oneshot(args: TrainArgs_simple):
 def train_gnn(arguments=None):
     """Main training function that delegates to appropriate stage."""
 
-    args = (
-        TrainArgs_simple().parse_args(arguments) if arguments else TrainArgs_simple().parse_args()
-    )
+    args = TrainArgs().parse_args(arguments) if arguments else TrainArgs().parse_args()
     stage = args.stage
 
     if stage == 1:

@@ -18,7 +18,7 @@ from torch.nn import functional as F
 from torch.optim import Adam
 from torch.optim.lr_scheduler import OneCycleLR, CosineAnnealingLR, ExponentialLR
 
-from quarc.src.quarc.cli.train_args import TrainArgs_simple
+from quarc.cli.train_args import TrainArgs
 from quarc.data.gnn_dataloader import TrainingBatch_agent
 from quarc.models.modules.gnn_heads import (
     GNNAgentAmountHead,
@@ -216,7 +216,7 @@ class BaseGNN(pl.LightningModule):
 
         model_args_path = logger_dir + "/args.yaml"
         model_args = yaml.load(open(model_args_path, "r"), Loader=yaml.FullLoader)
-        args = TrainArgs_simple().from_dict(model_args)
+        args = TrainArgs().from_dict(model_args)
 
         fdims = chemprop.featurizers.CondensedGraphOfReactionFeaturizer(mode_="REAC_DIFF").shape
         message_passing = BondMessagePassing(*fdims, d_h=args.graph_hidden_size, depth=args.depth)

@@ -12,19 +12,53 @@ from quarc.utils.quantity_utils import (
     preprocess_reagents,
 )
 from quarc.utils.smiles_utils import canonicalize_smiles
-from quarc.config import DEFAULT_DENSITY_PATH, PROCESSED_DATA_DIR
+from quarc.settings import load as load_settings
+
+cfg = load_settings()
 
 RDLogger.DisableLog("rdApp.*")
 
-#### Load necessary files ####
-density_clean = pd.read_csv(DEFAULT_DENSITY_PATH, sep="\t")
-reagent_conv_rules = json.load(
-    open(PROCESSED_DATA_DIR / "agent_encoder" / "agent_rules_v1.json", "r")
-)
+#### Lazy loading for density data ####
+_density_clean = None
+_reagent_conv_rules = None
+
+
+def _get_density_data():
+    """Lazy loading of density data. Raises error if unavailable and needed."""
+    global _density_clean
+    if _density_clean is None:
+        if cfg.pistachio_density_path is None:
+            raise InvalidDensityError(
+                "Density file path not configured. Set pistachio_density_path in your QUARC config."
+            )
+        try:
+            _density_clean = pd.read_csv(cfg.pistachio_density_path, sep="\t")
+        except (FileNotFoundError, pd.errors.EmptyDataError, pd.errors.ParserError) as e:
+            raise InvalidDensityError(
+                f"Could not load density file from {cfg.pistachio_density_path}: {e}. "
+                "This file is required for quantity preprocessing."
+            )
+    return _density_clean
+
+
+def _get_reagent_conv_rules():
+    """Lazy loading of reagent conversion rules."""
+    global _reagent_conv_rules
+    if _reagent_conv_rules is None:
+        try:
+            with open(cfg.processed_data_dir / "agent_encoder" / "agent_rules_v1.json", "r") as f:
+                _reagent_conv_rules = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            raise FileNotFoundError(
+                f"Could not load reagent conversion rules: {e}. "
+                "This file is required for preprocessing."
+            )
+    return _reagent_conv_rules
 
 
 def get_density(s):
     """Get density from density_clean.tsv, unit is (g/L)"""
+    density_clean = _get_density_data()
     if s not in density_clean["can_smiles"].values:
         raise InvalidDensityError(f"smiles={s} not found in density_clean can_smiles")
 
@@ -32,6 +66,7 @@ def get_density(s):
 
 
 def canonicalize_smiles_reagent_conv_rules(s):
+    reagent_conv_rules = _get_reagent_conv_rules()
     r = reagent_conv_rules.get(s, None)
     if r is not None:
         return r

@@ -13,13 +13,6 @@ from tqdm import tqdm
 from collections import defaultdict
 from multiprocessing import Pool
 
-from quarc.config import (
-    PROCESSED_DATA_DIR,
-    STAGE1_DIR,
-    STAGE2_DIR,
-    STAGE3_DIR,
-    STAGE4_DIR,
-)
 from quarc.data.datapoints import ReactionDatum
 
 RDLogger.DisableLog("rdApp.*")

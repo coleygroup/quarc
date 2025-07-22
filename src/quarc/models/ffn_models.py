@@ -8,7 +8,7 @@ from torch.nn import functional as F
 from torch.optim import Adam
 from torch.optim.lr_scheduler import OneCycleLR, ExponentialLR
 
-from quarc.src.quarc.cli.train_args import TrainArgs_simple
+from quarc.cli.train_args import TrainArgs
 from quarc.models.modules.ffn_heads import (
     FFNBaseHead,
     FFNAgentAmountHead,
@@ -139,7 +139,7 @@ class BaseFFN(pl.LightningModule):
 
         model_args_path = logger_dir + "/args.yaml"
         model_args = yaml.load(open(model_args_path, "r"), Loader=yaml.FullLoader)
-        args = TrainArgs_simple().from_dict(model_args)
+        args = TrainArgs().from_dict(model_args)
 
         # Initialize predictor
         predictor = predictor_cls(

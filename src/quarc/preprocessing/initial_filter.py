@@ -8,12 +8,14 @@ from rdkit import Chem, RDLogger
 from tqdm import tqdm
 
 from quarc.data.datapoints import ReactionDatum
-from quarc.quarc.utils.smiles_utils import COMMON_SOLVENTS_CANONICAL
 from quarc.models.modules.agent_encoder import AgentEncoder
 from quarc.models.modules.agent_standardizer import AgentStandardizer
+from quarc.utils.smiles_utils import get_common_solvents_canonical
 
 RDLogger.DisableLog("rdApp.*")
 ### Potential filters (True -> keep, False -> remove) ###
+
+COMMON_SOLVENTS_CANONICAL = get_common_solvents_canonical()
 
 
 # Length filters

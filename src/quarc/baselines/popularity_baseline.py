@@ -7,12 +7,14 @@ from typing import NamedTuple, Tuple, FrozenSet
 
 from quarc.models.modules.agent_encoder import AgentEncoder
 from quarc.models.modules.agent_standardizer import AgentStandardizer
-from quarc.config import PROCESSED_DATA_DIR
+from quarc.settings import load as load_settings
 
-a_enc = AgentEncoder(class_path=PROCESSED_DATA_DIR / "agent_encoder/agent_encoder_list.json")
+cfg = load_settings()
+
+a_enc = AgentEncoder(class_path=cfg.processed_data_dir / "agent_encoder/agent_encoder_list.json")
 a_standardizer = AgentStandardizer(
-    conv_rules=PROCESSED_DATA_DIR / "agent_encoder/agent_rules_v1.json",
-    other_dict=PROCESSED_DATA_DIR / "agent_encoder/agent_other_dict.json",
+    conv_rules=cfg.processed_data_dir / "agent_encoder/agent_rules_v1.json",
+    other_dict=cfg.processed_data_dir / "agent_encoder/agent_other_dict.json",
 )
 
 
@@ -27,7 +29,7 @@ def get_popularity_sets_from_train(train_data, a_standardizer, a_enc):
         rxn_class: counter.most_common(10) for rxn_class, counter in popularity_sets.items()
     }
 
-    with open(PROCESSED_DATA_DIR / "pop_baseline/stage1_top_10_popularity_sets.pickle", "wb") as f:
+    with open(cfg.processed_data_dir / "pop_baseline/stage1_top_10_popularity_sets.pickle", "wb") as f:
         pickle.dump(top_10_sets, f)
     return popularity_sets
 
@@ -120,7 +122,7 @@ def get_overall_popularity_from_train(train_data, a_standardizer, a_enc):
         rxn_class: counter.most_common(10) for rxn_class, counter in popularity_baseline.items()
     }
 
-    with open(PROCESSED_DATA_DIR / "pop_baseline/top_10_overall_conditions.pickle", "wb") as f:
+    with open(cfg.processed_data_dir / "pop_baseline/top_10_overall_conditions.pickle", "wb") as f:
         pickle.dump(top_10_conditions, f)
 
     return popularity_baseline

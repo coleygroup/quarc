@@ -4,11 +4,44 @@ import pandas as pd
 from rdkit import Chem, RDLogger
 from rdkit.Chem import AllChem
 
-from quarc.config import DEFAULT_DENSITY_PATH
+from quarc.settings import load as load_settings
+
+cfg = load_settings()
 
 RDLogger.DisableLog("rdApp.*")
 
-density_clean = pd.read_csv(DEFAULT_DENSITY_PATH, sep="\t")
+_density_clean = None
+_COMMON_SOLVENTS_CANONICAL = None
+
+
+def _get_density_data():
+    """Lazy loading of density data. Returns None if file is unavailable."""
+    global _density_clean
+    if _density_clean is None:
+        try:
+            if cfg.pistachio_density_path is None:
+                return None
+            _density_clean = pd.read_csv(cfg.pistachio_density_path, sep="\t")
+        except (FileNotFoundError, pd.errors.EmptyDataError, pd.errors.ParserError):
+            _density_clean = False
+            return None
+    return _density_clean if _density_clean is not False else None
+
+
+def _get_common_solvents():
+    """Lazy loading of common solvents list. Returns empty set if density data unavailable."""
+    global _COMMON_SOLVENTS_CANONICAL
+    if _COMMON_SOLVENTS_CANONICAL is None:
+        density_clean = _get_density_data()
+        if density_clean is None:
+            _COMMON_SOLVENTS_CANONICAL = set()
+        else:
+            common_solvents_list = density_clean[density_clean["name"].isin(solvents_verified)][
+                "can_smiles"
+            ].tolist()
+            _COMMON_SOLVENTS_CANONICAL = set(common_solvents_list)
+    return _COMMON_SOLVENTS_CANONICAL
+
 
 solvents_verified = [
     "pentane",
@@ -90,7 +123,7 @@ solvents_verified = [
     "TFA",
     "carbon tetrachloride",
     "hydrazine hydrate",
-    "isoporpyl alcohol",
+    "isopropyl alcohol",
     # 16 newly added solv with densities
     "deuterochloroform",
     "tert-Amyl alcohol",
@@ -109,10 +142,11 @@ solvents_verified = [
     "triethylene glycol",
     "p-cymene",
 ]
-common_solvents_list = density_clean[density_clean["name"].isin(solvents_verified)][
-    "can_smiles"
-].tolist()
-COMMON_SOLVENTS_CANONICAL = set(common_solvents_list)
+
+
+def get_common_solvents_canonical() -> set[str]:
+    """Get the set of common solvent canonical SMILES. Returns empty set if density data unavailable."""
+    return _get_common_solvents()
 
 
 def parse_rxn_smiles(rxn_smiles: str) -> tuple[list[str], list[str], list[str]]:

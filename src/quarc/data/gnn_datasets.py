@@ -178,14 +178,15 @@ class AgentReactionDatasetWithReactionClass(Dataset):
         data: list[ReactionDatum],
         agent_standardizer: AgentStandardizer,
         agent_encoder: AgentEncoder,
+        rxn_encoder: ReactionClassEncoder,
         featurizer: CondensedGraphOfReactionFeaturizer,
         **kwargs,
     ):
         self.agent_standardizer = agent_standardizer
         self.agent_encoder = agent_encoder
+        self.rxn_encoder = rxn_encoder
         self.featurizer = featurizer
         self.data = data
-        self.rxn_encoder = ReactionClassEncoder()
 
     def __len__(self):
         return len(self.data)

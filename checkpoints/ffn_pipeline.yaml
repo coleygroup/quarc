@@ -1,4 +1,4 @@
-base_model_dir: "./trained_models"
+base_model_dir: "/home/xiaoqis/projects/cond_rec_clean/trained_models"
 
 models:
   agent:
@@ -46,3 +46,16 @@ models:
       hidden_dim: 2048
       n_blocks: 3
       activation: "ReLU"
+
+optimized_weights:
+  use_geometric: True
+  use_top_5:
+    agent: 0.3
+    temperature: 0.2
+    reactant_amount: 0.4
+    agent_amount: 0.35
+  use_top_10:
+    agent: 0.15
+    temperature: 0.1
+    reactant_amount: 0.2
+    agent_amount: 0.35

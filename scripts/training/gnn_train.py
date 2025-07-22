@@ -19,11 +19,9 @@ from lightning.pytorch.utilities.rank_zero import rank_zero_only
 from torchmetrics.classification import Accuracy
 from torcheval.metrics.functional import multilabel_accuracy
 
-from args import TrainArgs_simple
+from quarc.cli.train_args import TrainArgs_simple
 from quarc.config import (
-    send_slack_notification,
     PROCESSED_DATA_DIR,
-    LOG_DIR,
     MODELS_DIR,
     STAGE1_DIR,
     STAGE2_DIR,

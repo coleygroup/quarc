@@ -17,7 +17,7 @@ from lightning.pytorch.utilities.rank_zero import rank_zero_only
 from torchmetrics.classification import Accuracy
 from torcheval.metrics.functional import multilabel_accuracy
 from torch.utils.data import DataLoader
-from args import TrainArgs_simple
+from quarc.cli.train_args import TrainArgs_simple
 from quarc.config import (
     PROCESSED_DATA_DIR,
     MODELS_DIR,

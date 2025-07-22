@@ -1,4 +1,4 @@
-base_model_dir: "./trained_models"
+base_model_dir: "/home/xiaoqis/projects/cond_rec_clean/trained_models"
 
 models:
   agent:
@@ -48,3 +48,16 @@ models:
       n_blocks: 3
       output_dim: 27
       agent_input_dim: 1376
+
+optimized_weights:
+  use_geometric: True
+  use_top_5:
+    agent: 0.25
+    temperature: 0.1
+    reactant_amount: 0.45
+    agent_amount: 0.5
+  use_top_10:
+    agent: 0.35
+    temperature: 0.1
+    reactant_amount: 0.6
+    agent_amount: 0.5

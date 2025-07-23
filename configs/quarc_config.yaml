@@ -1,0 +1,10 @@
+
+# Data storage location
+data_root: "~/quarc/data"
+processed_data_root: "~/quarc/data/processed"
+models_root: "~/quarc/models"
+checkpoints_root: "~/quarc/checkpoints"
+
+# Pistachio files
+pistachio_density_path: null # Required for preprocessing
+pistachio_namerxn_path: null # Required for training and inference

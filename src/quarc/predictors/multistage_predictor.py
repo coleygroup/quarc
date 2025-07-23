@@ -407,7 +407,7 @@ class EnumeratedPredictor(BasePredictor):
             device=self.device,
         )
 
-        enumerated_predictions = self._rank_enumerate_combinations(hierarchical_view)[:top_k]
+        enumerated_predictions = self._rank_enumerate_combinations(hierarchical_view, top_k)
 
         return PredictionList(
             doc_id=hierarchical_view.doc_id,
@@ -417,7 +417,7 @@ class EnumeratedPredictor(BasePredictor):
         )
 
     def _rank_enumerate_combinations(
-        self, hierarchical_preds: HierarchicalPrediction
+        self, hierarchical_preds: HierarchicalPrediction, top_k: int
     ) -> list[StagePrediction]:
         """
         Convert hierarchical view to flat enumerated predictions.
@@ -473,7 +473,7 @@ class EnumeratedPredictor(BasePredictor):
 
         enumerated_predictions.sort(key=lambda x: x.score, reverse=True)
 
-        return enumerated_predictions
+        return enumerated_predictions[:top_k]
 
     def _calculate_combined_score(
         self,

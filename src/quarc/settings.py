@@ -5,6 +5,7 @@ from typing import Any
 
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     pass
@@ -14,8 +15,6 @@ _DEFAULTS: dict[str, Any] = {
     "processed_data_root": "~/quarc/data/processed",
     "models_root": "~/quarc/models",
     "checkpoints_root": "~/quarc/checkpoints",
-    ## Pistachio related resources:
-    # Required for preprocessing and re-training the paper version models (takes NameRxn as inputs)
     "pistachio_density_path": None,
     "pistachio_namerxn_path": None,
 }
@@ -51,7 +50,9 @@ def load(user_cfg: str | None = None) -> Settings:
 
     # 1) YAML override
     if user_cfg is None:
-        user_cfg = os.getenv("QUARC_CONFIG", str(Path.home() / ".quarc" / "config.yaml"))
+        user_cfg = os.getenv(
+            "QUARC_CONFIG", str(Path.home() / ".quarc" / "configs" / "quarc_config.yaml")
+        )
     p = Path(user_cfg).expanduser()
     if p.is_file():
         cfg.update(yaml.safe_load(p.read_text()))

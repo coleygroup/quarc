@@ -21,25 +21,6 @@ from quarc.settings import load as load_settings
 
 
 def format_predictions(predictions, agent_encoder: AgentEncoder, top_k: int = 5) -> dict[str, Any]:
-    """
-    The `format_predictions` function formats prediction data with human-readable labels for agents,
-    temperature, reactants, and amounts.
-
-    :param predictions: The `format_predictions` function takes in several parameters:
-    :param agent_encoder: AgentEncoder is an object used to encode and decode agent information in the
-    predictions. It helps convert agent data into a human-readable format for display
-    :type agent_encoder: AgentEncoder
-    :param top_k: The `top_k` parameter in the `format_predictions` function specifies the number of top
-    predictions to include in the formatted output. It determines how many of the top predictions will
-    be processed and included in the final results, defaults to 5
-    :type top_k: int (optional)
-    :return: A dictionary containing formatted predictions with human-readable labels for the given
-    input predictions, agent encoder, and top_k value. The dictionary includes information such as
-    document ID, reaction class, reaction SMILES, and a list of formatted predictions for the top_k
-    predictions, each containing details like rank, score, agents, temperature, reactant amounts, agent
-    amounts, and raw scores (if available).
-    """
-    """Format predictions with human-readable labels"""
     binning_config = BinningConfig.default()
     temp_labels = binning_config.get_bin_labels("temperature")
     reactant_labels = binning_config.get_bin_labels("reactant")

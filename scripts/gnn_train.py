@@ -21,8 +21,8 @@ from torcheval.metrics.functional import multilabel_accuracy
 
 from quarc.cli.train_args import TrainArgs
 from quarc.data.gnn_datasets import (
-    AugmentedAgentReactionDatasetWithReactionClass,
-    AgentReactionDatasetWithReactionClass,
+    GNNAugmentedAgentsDatasetWithRxnClass,
+    GNNAgentsDatasetWithRxnClass,
     GNNBinnedTemperatureDataset,
     GNNBinnedReactantAmountDataset,
     GNNBinnedAgentAmountOneShotDataset,
@@ -106,13 +106,13 @@ def train_stage_1_model_with_reaction_class(args: TrainArgs):
 
     # Load Data
     featurizer = featurizers.CondensedGraphOfReactionFeaturizer(mode_="REAC_DIFF")
-    train_dataset = AugmentedAgentReactionDatasetWithReactionClass(
+    train_dataset = GNNAugmentedAgentsDatasetWithRxnClass(
         original_data=train_data,
         agent_standardizer=a_standardizer,
         agent_encoder=a_enc,
         featurizer=featurizer,
     )
-    val_dataset = AgentReactionDatasetWithReactionClass(
+    val_dataset = GNNAgentsDatasetWithRxnClass(
         data=val_data,
         agent_standardizer=a_standardizer,
         agent_encoder=a_enc,

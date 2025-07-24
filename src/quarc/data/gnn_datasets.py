@@ -62,7 +62,7 @@ def indices_to_multihot(indices: np.ndarray, n_agents: int) -> np.ndarray:
     return vector
 
 
-class AugmentedAgentReactionDatasetWithReactionClass(Dataset):
+class GNNAugmentedAgentsDatasetWithRxnClass(Dataset):
     """Lazy augmentation on the fly with index mapping"""
 
     def __init__(
@@ -170,7 +170,7 @@ class AugmentedAgentReactionDatasetWithReactionClass(Dataset):
         )
 
 
-class AgentReactionDatasetWithReactionClass(Dataset):
+class GNNAgentsDatasetWithRxnClass(Dataset):
     """Agent reaction dataset with no augmentation, for evaluation"""
 
     def __init__(

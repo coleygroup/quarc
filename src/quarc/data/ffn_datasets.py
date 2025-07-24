@@ -82,7 +82,7 @@ class ReactionDatasetBase(Dataset):
         pass
 
 
-class AugmentedAgentsDataset(Dataset):
+class AugmentedAgentsDatasetWithRxnClass(Dataset):
     """
     Dataset for generating all possible combinations of splitting to input and target agents.
 
@@ -211,7 +211,7 @@ class AugmentedAgentsDataset(Dataset):
         return torch.cat((FP_r, FP_p))
 
 
-class AgentsDatasetWithReactionClass(ReactionDatasetBase):
+class AgentsDatasetWithRxnClass(ReactionDatasetBase):
     """Regular Agent Dataset for validation and testing with reaction class.
 
     For each reaction, the input is the FP and no agent, and the target is all agents.

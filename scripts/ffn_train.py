@@ -20,8 +20,8 @@ from torch.utils.data import DataLoader
 from quarc.cli.train_args import TrainArgs
 
 from quarc.data.ffn_datasets import (
-    AugmentedAgentsDataset,
-    AgentsDatasetWithReactionClass,
+    AugmentedAgentsDatasetWithRxnClass,
+    AgentsDatasetWithRxnClass,
     BinnedTemperatureDataset,
     BinnedReactantAmountDataset,
     BinnedAgentAmoutOneshot,
@@ -102,7 +102,7 @@ def train_stage_1_model(args: TrainArgs):
         logger.info(f"Stage 1data length: train: {len(train_data)}, val: {len(val_data)}")
 
     # Load Data
-    train_dataset = AugmentedAgentsDataset(
+    train_dataset = AugmentedAgentsDatasetWithRxnClass(
         original_data=train_data,
         agent_standardizer=a_standardizer,
         agent_encoder=a_enc,
@@ -110,7 +110,7 @@ def train_stage_1_model(args: TrainArgs):
         fp_radius=args.FP_radius,
         fp_length=args.FP_length,
     )
-    val_dataset = AgentsDatasetWithReactionClass(
+    val_dataset = AgentsDatasetWithRxnClass(
         data=val_data,
         agent_standardizer=a_standardizer,
         agent_encoder=a_enc,

@@ -58,7 +58,7 @@ class GNNAgentHead(GNNBaseHead):
         self.criterion = nn.CrossEntropyLoss(reduction="none")
 
 
-class GNNAgentHeadWithReactionClass(HyperparametersMixin, nn.Module):
+class GNNAgentHeadWithRxnClass(HyperparametersMixin, nn.Module):
     def __init__(
         self,
         graph_input_dim: int,  # Hidden dimension from message passing
@@ -80,7 +80,7 @@ class GNNAgentHeadWithReactionClass(HyperparametersMixin, nn.Module):
 
         rxn_hidden_dim = 512
         self.reaction_projector = nn.Sequential(
-            nn.Linear(2272, rxn_hidden_dim),
+            nn.Linear(2272, rxn_hidden_dim),  # FIXME: hardcoded
             nn.LayerNorm(rxn_hidden_dim),
             nn.ReLU(),
         )

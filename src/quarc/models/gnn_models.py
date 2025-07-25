@@ -23,7 +23,7 @@ from quarc.data.gnn_dataloader import TrainingBatch_agent
 from quarc.models.modules.gnn_heads import (
     GNNAgentAmountHead,
     GNNAgentHead,
-    GNNAgentHeadWithReactionClass,
+    GNNAgentHeadWithRxnClass,
     GNNReactantAmountHead,
     GNNTemperatureHead,
 )
@@ -203,7 +203,7 @@ class BaseGNN(pl.LightningModule):
             "TemperatureGNN": GNNTemperatureHead,
             "ReactantAmountGNN": GNNReactantAmountHead,
             "AgentAmountOneshotGNN": GNNAgentAmountHead,
-            "AgentGNNWithReactionClass": GNNAgentHeadWithReactionClass,
+            "AgentGNNWithRxnClass": GNNAgentHeadWithRxnClass,
         }
         predictor_cls = PREDICTOR_MAP.get(cls.__name__)
         if predictor_cls is None:
@@ -243,7 +243,60 @@ class BaseGNN(pl.LightningModule):
         return model
 
 
-class AgentGNNWithReactionClass(BaseGNN):
+class AgentGNN(BaseGNN):
+    def loss_fn(self, preds: Tensor, targets: Tensor, weights: Tensor) -> Tensor:
+        """Sample-weighted cross entropy loss with mean reduction"""
+        loss = self.criterion(preds, targets)
+        return (loss * weights).mean()
+
+    def training_step(self, batch: TrainingBatch_agent, batch_idx):
+        a_input, bmg, V_d, X_d, targets, weights, lt_mask, gt_mask = batch
+        preds = self(a_input, bmg, V_d, X_d)
+        l = self.loss_fn(preds, targets, weights)
+        self.log(
+            "train_loss",
+            l,
+            batch_size=len(batch[0]),
+            prog_bar=True,
+            on_step=False,
+            on_epoch=True,
+            sync_dist=True,
+        )
+        return l
+
+    def validation_step(self, batch: TrainingBatch_agent, batch_idx):
+        a_input, bmg, V_d, X_d, targets, weights, lt_mask, gt_mask = batch
+        preds = self(a_input, bmg, V_d, X_d)
+
+        val_loss = self.loss_fn(preds, targets, weights)
+        self.log(
+            "val_loss",
+            val_loss,
+            batch_size=len(batch[0]),
+            prog_bar=True,
+            on_step=False,
+            on_epoch=True,
+            sync_dist=True,
+        )
+
+        for metric_name, metric_f in self.metrics.items():
+            if isinstance(metric_f, nn.Module):
+                metric_f = metric_f.to(self.device)
+
+            if "multilabel" in metric_name:
+                metric = metric_f(F.sigmoid(preds), targets)
+            else:
+                metric = metric_f(preds, targets)
+            self.log(metric_name, metric, batch_size=len(batch[0]), on_epoch=True, sync_dist=True)
+        return val_loss
+
+    def configure_optimizers(self):
+        opt = Adam(self.parameters(), lr=self.init_lr)
+        lr_sched = ExponentialLR(optimizer=opt, gamma=0.98)
+        return {"optimizer": opt, "lr_scheduler": lr_sched}
+
+
+class AgentGNNWithRxnClass(BaseGNN):
     def forward(
         self,
         agent_input: Tensor,

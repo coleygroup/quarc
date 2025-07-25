@@ -82,6 +82,7 @@ class ReactionDatasetBase(Dataset):
         pass
 
 
+# Agents datasets with reaction class
 class AugmentedAgentsDatasetWithRxnClass(Dataset):
     """
     Dataset for generating all possible combinations of splitting to input and target agents.
@@ -262,8 +263,168 @@ class AgentsDatasetWithRxnClass(ReactionDatasetBase):
 
         return FP_input, a_input, a_target, rxn_class
 
-    def _getname(self):
-        return "AgentsDataset"
+
+# Agents dataset without reaction class for open source version
+class AugmentedAgentsDataset(Dataset):
+    """
+    Agents dataset with augmentation and WITHOUT reaction class.
+    Uses precomputed index mapping for efficient access while maintaining lazy computation of features.
+    """
+
+    def __init__(
+        self,
+        original_data: list[ReactionDatum],
+        agent_standardizer: AgentStandardizer,
+        agent_encoder: AgentEncoder,
+        fp_radius: int = 3,
+        fp_length: int = 2048,
+        sample_weighting: Literal["pascal", "uniform", "none"] = "pascal",
+    ):
+        super().__init__()
+        self.original_data = original_data
+        self.agent_standardizer = agent_standardizer
+        self.agent_encoder = agent_encoder
+        self.fp_radius = fp_radius
+        self.fp_length = fp_length
+        self.sample_weighting = sample_weighting
+
+        self.index_mapping = self._create_index_mapping()
+
+    def _create_index_mapping(self):
+        """Create mapping between original index and augmented index.
+
+        Either as (original_idx, -1) for base case (full set) or (original_idx, (r, comb_idx)) for combinations.
+        """
+
+        mapping = []
+        for orig_idx, datum in enumerate(self.original_data):
+            agent_smiles = [agent.smiles for agent in datum.agents]
+            standardized_smiles = self.agent_standardizer.standardize(agent_smiles)
+            a_idxs_orig = self.agent_encoder.encode(standardized_smiles)
+            # base case (full set)
+            mapping.append((orig_idx, -1))
+
+            # combinations
+            for r in range(1, len(a_idxs_orig) + 1):
+                for combo_idx, _ in enumerate(combinations(range(len(a_idxs_orig)), r)):
+                    mapping.append((orig_idx, (r, combo_idx)))
+        return mapping
+
+    def __len__(self):
+        return len(self.index_mapping)
+
+    def __getitem__(self, idx: int) -> tuple[Tensor, Tensor, Tensor, float]:
+        """Get item from index mapping.
+
+        Args:
+            idx: dataset index.
+
+        Returns:
+            FP_input: reaction fingerprint
+            a_input: input agents as multi-hot tensor
+            a_target: target agents as multi-hot tensor
+            weight: weight of the training sample
+        """
+
+        orig_idx, aug_spec = self.index_mapping[idx]
+        original_datum = self.original_data[orig_idx]
+
+        # Generate reaction fingerprint
+        FP_input = self.generate_reaction_fingerprint(original_datum)
+
+        # Get agent indices
+        agent_smiles = [agent.smiles for agent in original_datum.agents]
+        standardized_smiles = self.agent_standardizer.standardize(agent_smiles)
+        a_idxs_orig = torch.tensor(self.agent_encoder.encode(standardized_smiles))
+        a_orig = torch.zeros(len(self.agent_encoder)).scatter(-1, a_idxs_orig, 1)
+
+        # Calculate weights
+        if self.sample_weighting == "pascal":
+            all_sample_weights = self.pascal_triangle_weights(len(a_idxs_orig))
+        elif self.sample_weighting == "uniform":
+            all_sample_weights = torch.full((2 ** len(a_idxs_orig),), 1 / (2 ** len(a_idxs_orig)))
+        elif self.sample_weighting == "none":
+            all_sample_weights = torch.full((2 ** len(a_idxs_orig),), 1)
+        else:
+            raise ValueError(f"Invalid sample_weighting: {self.sample_weighting}")
+
+        # Handle base case vs combinations
+        if aug_spec == -1:
+            # Full set of agents as input, EOS token as target
+            a_input = a_orig
+            a_target = torch.zeros_like(a_orig).scatter(-1, torch.tensor([0]), 1)
+            weight = all_sample_weights[0]
+        else:
+            r, combo_idx = aug_spec
+            all_combos = list(combinations(range(len(a_idxs_orig)), r))
+            combo = all_combos[combo_idx]
+            a_input = a_orig.clone()
+            a_input[a_idxs_orig[list(combo)]] = 0
+            a_target = a_orig - a_input
+            weight = all_sample_weights[r]
+
+        return FP_input, a_input, a_target, weight
+
+    def pascal_triangle_weights(self, n_agents: int) -> torch.Tensor:
+        """Generates weights based on Pascal's Triangle for a given number of agents."""
+        weights = [math.comb(n_agents, k) for k in range(n_agents + 1)]
+        inv_weights = [1 / w for w in weights]
+        return torch.tensor(inv_weights)
+
+    def generate_fingerprint(self, agent_records: list[AgentRecord]) -> torch.Tensor:
+        smi_list = [agent_record.smiles for agent_record in agent_records]
+        merged_smi = ".".join(smi_list)
+        mol = Chem.MolFromSmiles(merged_smi)
+
+        fp_arr = np.zeros((2048,), dtype=bool)
+        if mol is not None and mol.GetNumHeavyAtoms() > 0:
+            fp_arr = rdMolDescriptors.GetMorganFingerprintAsBitVect(
+                mol, radius=self.fp_radius, nBits=self.fp_length
+            )
+        return torch.tensor(fp_arr, dtype=torch.bool)
+
+    def generate_reaction_fingerprint(self, reaction_datum: ReactionDatum) -> torch.Tensor:
+        FP_r = self.generate_fingerprint(reaction_datum.reactants)
+        FP_p = self.generate_fingerprint(reaction_datum.products)
+        return torch.cat((FP_r, FP_p))
+
+
+class AgentsDataset(ReactionDatasetBase):
+    """Regular Agent Dataset for validation and testing without reaction class.
+
+    For each reaction, the input is the FP and no agent, and the target is all agents.
+    """
+
+    def __init__(
+        self,
+        data: list[ReactionDatum],
+        agent_standardizer: AgentStandardizer,
+        agent_encoder: AgentEncoder,
+        fp_radius: int = 3,
+        fp_length: int = 2048,
+    ):
+
+        super().__init__(data, agent_standardizer, agent_encoder, fp_radius, fp_length)
+
+    def __getitem__(self, idx):
+        """Get item from index mapping.
+
+        Args:
+            idx: dataset index.
+
+        Returns:
+            FP_input: reaction fingerprint
+            a_input: empty multi-hot tensor
+            a_target: multi-hot tensor of all agents
+        """
+
+        datum = self.data[idx]
+
+        FP_input = self.generate_reaction_fingerprint(datum)
+        a_target = self.standardize_and_encode_agents(datum.agents)
+        a_input = torch.zeros_like(a_target)
+
+        return FP_input, a_input, a_target
 
 
 class BinnedTemperatureDataset(ReactionDatasetBase):

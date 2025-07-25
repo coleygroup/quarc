@@ -51,7 +51,7 @@ class FFNAgentHead(FFNBaseHead):
         self._criterion = nn.CrossEntropyLoss(reduction="none")
 
 
-class FFNAgentHeadWithReactionClass(FFNBaseHead):
+class FFNAgentHeadWithRxnClass(FFNBaseHead):
     """Predictor for agent identity: multilabel classification w/ CEloss."""
 
     def __init__(

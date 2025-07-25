@@ -62,6 +62,7 @@ def indices_to_multihot(indices: np.ndarray, n_agents: int) -> np.ndarray:
     return vector
 
 
+# GNN Agentdatasets with reaction class
 class GNNAugmentedAgentsDatasetWithRxnClass(Dataset):
     """Lazy augmentation on the fly with index mapping"""
 
@@ -223,6 +224,172 @@ class GNNAgentsDatasetWithRxnClass(Dataset):
             mg=mg,
             V_d=None,
             x_d=self.rxn_encoder.to_onehot(d.rxn_class),
+            y=indices_to_multihot(a_idxs, len(self.agent_encoder)),
+            weight=1.0,
+            lt_mask=None,
+            gt_mask=None,
+        )
+
+
+# GNN Agent datasets without reaction class
+class GNNAugmentedAgentsDataset(Dataset):
+    """GNN Agent dataset with augmentation and WITHOUT reaction class"""
+
+    def __init__(
+        self,
+        original_data: list[ReactionDatum],
+        agent_standardizer: AgentStandardizer,
+        agent_encoder: AgentEncoder,
+        featurizer: CondensedGraphOfReactionFeaturizer,
+        sample_weighting: str = "pascal",
+        **kwargs,
+    ):
+        self.sample_weighting = sample_weighting
+        self.agent_standardizer = agent_standardizer
+        self.agent_encoder = agent_encoder
+        self.featurizer = featurizer
+        self.original_data = original_data
+
+        self.index_mapping = self._create_index_mapping()
+
+    def _create_index_mapping(self):
+        """Create mapping from augmented index to (original_idx, (r, comb_idx))
+        For base case, (original_idx, -1)
+        """
+        mapping = []
+        for orig_idx, datum in enumerate(self.original_data):
+            a_idxs_orig = standardize_and_encode_agents(
+                datum.agents, self.agent_standardizer, self.agent_encoder
+            )
+
+            # base case
+            mapping.append((orig_idx, -1))
+
+            # combinations
+            for r in range(1, len(a_idxs_orig) + 1):
+                for combo_idx, _ in enumerate(combinations(range(len(a_idxs_orig)), r)):
+                    mapping.append((orig_idx, (r, combo_idx)))
+        return mapping
+
+    def pascal_triangle_weights(self, n_agents: int) -> np.ndarray:
+        """Generates weights based on Pascal's Triangle for a given number of agents."""
+        weights = [math.comb(n_agents, k) for k in range(n_agents + 1)]
+        inv_weights = [1 / w for w in weights]
+        return np.array(inv_weights)
+
+    def __len__(self):
+        return len(self.index_mapping)
+
+    def __getitem__(self, idx: int) -> Datum_agent:
+        orig_idx, aug_spec = self.index_mapping[idx]
+        original_datum = self.original_data[orig_idx]
+
+        # get all required indices and weights
+        a_idxs_orig = standardize_and_encode_agents(
+            original_datum.agents, self.agent_standardizer, self.agent_encoder
+        )
+        if self.sample_weighting == "pascal":
+            all_sample_weights = self.pascal_triangle_weights(len(a_idxs_orig))
+        elif self.sample_weighting == "uniform":
+            all_sample_weights = np.full((2 ** len(a_idxs_orig),), 1 / (2 ** len(a_idxs_orig)))
+        elif self.sample_weighting == "none":
+            all_sample_weights = np.full((2 ** len(a_idxs_orig),), 1)
+        else:
+            raise ValueError(f"Invalid sample_weighting: {self.sample_weighting}")
+
+        if aug_spec == -1:
+            input_indices = a_idxs_orig.copy()
+            target_indices = np.array([0])
+            weight = 1.0
+        else:
+            r, combo_idx = aug_spec
+            all_combos = list(combinations(range(len(a_idxs_orig)), r))
+            combo = all_combos[combo_idx]
+            input_indices = np.delete(a_idxs_orig, combo)
+            target_indices = a_idxs_orig[list(combo)]
+            weight = all_sample_weights[r]
+
+        rxn_smiles = prep_rxn_smi_input(original_datum.rxn_smiles)
+        rxn_mols = rxn_smiles_to_mols(rxn_smiles)  # (rct, pdt)
+
+        if rxn_mols[0] is None or rxn_mols[1] is None:
+            # logger.warning(f"Found invalid reaction, using placeholder: {original_datum.rxn_smiles}")
+            dummy_mg = self.featurizer((Chem.MolFromSmiles("CCCCC"), Chem.MolFromSmiles("CCCCC")))
+            return Datum_agent(
+                a_input=indices_to_multihot(input_indices, len(self.agent_encoder)),
+                mg=dummy_mg,  # dummy mg
+                V_d=None,
+                x_d=None,
+                y=np.zeros(len(self.agent_encoder), dtype=np.bool_),  # dummy y
+                weight=0.0,
+                lt_mask=None,
+                gt_mask=None,
+            )
+
+        mg = self.featurizer(rxn_mols)
+        return Datum_agent(
+            a_input=indices_to_multihot(input_indices, len(self.agent_encoder)),
+            mg=mg,
+            V_d=None,
+            x_d=None,
+            y=indices_to_multihot(target_indices, len(self.agent_encoder)),
+            weight=weight,
+            lt_mask=None,
+            gt_mask=None,
+        )
+
+
+class GNNAgentsDataset(Dataset):
+    """GNN Agent dataset with no augmentation, for evaluation, without reaction class"""
+
+    def __init__(
+        self,
+        data: list[ReactionDatum],
+        agent_standardizer: AgentStandardizer,
+        agent_encoder: AgentEncoder,
+        featurizer: CondensedGraphOfReactionFeaturizer,
+        **kwargs,
+    ):
+        self.agent_standardizer = agent_standardizer
+        self.agent_encoder = agent_encoder
+        self.featurizer = featurizer
+        self.data = data
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx: int) -> Datum_agent:
+        d = self.data[idx]
+
+        # base case: input none, target full set
+        a_idxs = standardize_and_encode_agents(
+            d.agents, self.agent_standardizer, self.agent_encoder
+        )
+
+        # mg
+        rxn_smiles = prep_rxn_smi_input(d.rxn_smiles)
+        rxn_mols = rxn_smiles_to_mols(rxn_smiles)  # (rct, pdt)
+
+        if rxn_mols[0] is None or rxn_mols[1] is None:
+            # logger.warning(f"Found invalid reaction, using placeholder: {d.rxn_smiles}")
+            dummy_mg = self.featurizer((Chem.MolFromSmiles("CCCCC"), Chem.MolFromSmiles("CCCCC")))
+            return Datum_agent(
+                a_input=np.zeros(len(self.agent_encoder), dtype=np.bool_),
+                mg=dummy_mg,  # dummy mg
+                V_d=None,
+                x_d=None,
+                y=np.zeros(len(self.agent_encoder), dtype=np.bool_),  # dummy y
+                weight=0.0,
+                lt_mask=None,
+                gt_mask=None,
+            )
+
+        mg = self.featurizer(rxn_mols)
+        return Datum_agent(
+            a_input=indices_to_multihot([], len(self.agent_encoder)),
+            mg=mg,
+            V_d=None,
+            x_d=None,
             y=indices_to_multihot(a_idxs, len(self.agent_encoder)),
             weight=1.0,
             lt_mask=None,

@@ -24,9 +24,9 @@ class ReactionDatum:
     """
 
     # Reaction Info
-    document_id: str
-    rxn_class: str
-    date: str
+    document_id: str | None
+    rxn_class: str | None
+    date: str | None
     rxn_smiles: str
 
     # Reaction Context

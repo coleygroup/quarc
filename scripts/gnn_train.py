@@ -31,19 +31,20 @@ from quarc.models.gnn_models import (
     TemperatureGNN,
     ReactantAmountGNN,
     AgentAmountOneshotGNN,
-    AgentGNNWithReactionClass,
+    AgentGNNWithRxnClass,
 )
 from quarc.models.modules.gnn_heads import (
     GNNAgentHead,
     GNNTemperatureHead,
     GNNReactantAmountHead,
     GNNAgentAmountHead,
-    GNNAgentHeadWithReactionClass,
+    GNNAgentHeadWithRxnClass,
 )
 from quarc.models.callbacks import GNNGreedySearchCallback
 from quarc.data.gnn_dataloader import build_dataloader_agent
 from quarc.models.modules.agent_encoder import AgentEncoder
 from quarc.models.modules.agent_standardizer import AgentStandardizer
+from quarc.models.modules.rxn_encoder import ReactionClassEncoder
 from quarc.settings import load as load_settings
 
 cfg = load_settings()
@@ -93,6 +94,9 @@ def train_stage_1_model_with_reaction_class(args: TrainArgs):
         conv_rules=cfg.processed_data_dir / "agent_encoder/agent_rules_v1.json",
         other_dict=cfg.processed_data_dir / "agent_encoder/agent_other_dict.json",
     )
+    rxn_enc = ReactionClassEncoder(
+        class_path=cfg.pistachio_namerxn_path
+    )
     train_data_path = cfg.processed_data_dir / "stage1" / "stage1_train.pickle"
     val_data_path = cfg.processed_data_dir / "stage1" / "stage1_val.pickle"
 
@@ -110,12 +114,14 @@ def train_stage_1_model_with_reaction_class(args: TrainArgs):
         original_data=train_data,
         agent_standardizer=a_standardizer,
         agent_encoder=a_enc,
+        rxn_encoder=rxn_enc,
         featurizer=featurizer,
     )
     val_dataset = GNNAgentsDatasetWithRxnClass(
         data=val_data,
         agent_standardizer=a_standardizer,
         agent_encoder=a_enc,
+        rxn_encoder=rxn_enc,
         featurizer=featurizer,
     )
 
@@ -146,7 +152,7 @@ def train_stage_1_model_with_reaction_class(args: TrainArgs):
     fdims = featurizer.shape
     mp = chemprop.nn.BondMessagePassing(*fdims, d_h=args.graph_hidden_size, depth=args.depth)
     agg = chemprop.nn.MeanAggregation()
-    predictor = GNNAgentHeadWithReactionClass(
+    predictor = GNNAgentHeadWithRxnClass(
         graph_input_dim=args.graph_hidden_size,
         agent_input_dim=len(a_enc),
         output_dim=len(a_enc),
@@ -160,7 +166,7 @@ def train_stage_1_model_with_reaction_class(args: TrainArgs):
         ),
     }
 
-    model = AgentGNNWithReactionClass(
+    model = AgentGNNWithRxnClass(
         message_passing=mp,
         agg=agg,
         predictor=predictor,
@@ -439,14 +445,14 @@ def train_stage_3_model(args: TrainArgs):
         agent_standardizer=a_standardizer,
         agent_encoder=a_enc,
         featurizer=featurizer,
-        morgan_generator=fp_gen,
+        # morgan_generator=fp_gen,
     )
     val_dataset = GNNBinnedReactantAmountDataset(
         data=val_data,
         agent_standardizer=a_standardizer,
         agent_encoder=a_enc,
         featurizer=featurizer,
-        morgan_generator=fp_gen,
+        # morgan_generator=fp_gen,
     )
 
     train_loader = build_dataloader_agent(

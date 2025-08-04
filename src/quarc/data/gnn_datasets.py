@@ -484,8 +484,6 @@ class GNNBinnedReactantAmountDataset(Dataset):
         encoder for converting agents to indices
     featurizer : CondensedGraphOfReactionFeaturizer
         graph featurizer for reactions
-    morgan_generator : FingerprintGenerator64
-        morgan fingerprint generator
     bins : list[float], optional, default=[0.95, 1.05, ..., 7.5]
         bin edges for discretizing amounts.
 

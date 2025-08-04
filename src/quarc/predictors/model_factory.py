@@ -15,20 +15,20 @@ def load_checkpoint_smart(checkpoint_path, device):
 
 def create_ffn_model(model_class_name, params):
     from quarc.models.ffn_models import (
-        AgentFFNWithReactionClass,
+        AgentFFNWithRxnClass,
         TemperatureFFN,
         ReactantAmountFFN,
         AgentAmountFFN,
     )
     from quarc.models.modules.ffn_heads import (
-        FFNAgentHeadWithReactionClass,
+        FFNAgentHeadWithRxnClass,
         FFNTemperatureHead,
         FFNReactantAmountHead,
         FFNAgentAmountHead,
     )
 
     model_classes = {
-        "AgentFFNWithReactionClass": (AgentFFNWithReactionClass, FFNAgentHeadWithReactionClass),
+        "AgentFFNWithRxnClass": (AgentFFNWithRxnClass, FFNAgentHeadWithRxnClass),
         "TemperatureFFN": (TemperatureFFN, FFNTemperatureHead),
         "ReactantAmountFFN": (ReactantAmountFFN, FFNReactantAmountHead),
         "AgentAmountFFN": (AgentAmountFFN, FFNAgentAmountHead),
@@ -52,20 +52,20 @@ def create_ffn_model(model_class_name, params):
 
 def create_gnn_model(model_class_name, params):
     from quarc.models.gnn_models import (
-        AgentGNNWithReactionClass,
+        AgentGNNWithRxnClass,
         TemperatureGNN,
         ReactantAmountGNN,
         AgentAmountOneshotGNN,
     )
     from quarc.models.modules.gnn_heads import (
-        GNNAgentHeadWithReactionClass,
+        GNNAgentHeadWithRxnClass,
         GNNTemperatureHead,
         GNNReactantAmountHead,
         GNNAgentAmountHead,
     )
 
     model_classes = {
-        "AgentGNNWithReactionClass": (AgentGNNWithReactionClass, GNNAgentHeadWithReactionClass),
+        "AgentGNNWithRxnClass": (AgentGNNWithRxnClass, GNNAgentHeadWithRxnClass),
         "TemperatureGNN": (TemperatureGNN, GNNTemperatureHead),
         "ReactantAmountGNN": (ReactantAmountGNN, GNNReactantAmountHead),
         "AgentAmountOneshotGNN": (AgentAmountOneshotGNN, GNNAgentAmountHead),
@@ -100,7 +100,8 @@ def load_models_from_yaml(config_path, device="cuda"):
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 
-    base_dir = Path(config["base_model_dir"])
+    # use absolute path for running in notebooks. If running in CLI, the relative path is fine.
+    base_dir = Path(config_path).parent.parent / config["base_model_dir"]
 
     models = {}
     model_types = {}

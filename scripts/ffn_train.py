@@ -27,13 +27,14 @@ from quarc.data.ffn_datasets import (
     BinnedAgentAmoutOneshot,
 )
 from quarc.models.ffn_models import (
-    AgentFFNWithReactionClass,
+    AgentFFN,
+    AgentFFNWithRxnClass,
     TemperatureFFN,
     ReactantAmountFFN,
     AgentAmountFFN,
 )
 from quarc.models.modules.ffn_heads import (
-    FFNAgentHeadWithReactionClass,
+    FFNAgentHeadWithRxnClass,
     FFNTemperatureHead,
     FFNReactantAmountHead,
     FFNAgentAmountHead,
@@ -150,7 +151,7 @@ def train_stage_1_model(args: TrainArgs):
         )
 
     # Define Model
-    predictor = FFNAgentHeadWithReactionClass(
+    predictor = FFNAgentHeadWithRxnClass(
         fp_dim=args.FP_length,
         agent_input_dim=len(a_enc),
         output_dim=args.output_size,
@@ -165,7 +166,7 @@ def train_stage_1_model(args: TrainArgs):
     }
 
     steps_per_epoch = sum(1 for _ in train_loader)
-    model = AgentFFNWithReactionClass(
+    model = AgentFFNWithRxnClass(
         predictor=predictor,
         metrics=metrics,
         init_lr=args.init_lr,

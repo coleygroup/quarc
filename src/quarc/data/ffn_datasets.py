@@ -11,6 +11,7 @@ from torch import Tensor
 from torch.utils.data import Dataset, IterableDataset
 
 from quarc.data.datapoints import AgentRecord, ReactionDatum
+from quarc.data.binning import BinningConfig
 from quarc.models.modules.agent_encoder import AgentEncoder
 from quarc.models.modules.agent_standardizer import AgentStandardizer
 from quarc.models.modules.rxn_encoder import ReactionClassEncoder

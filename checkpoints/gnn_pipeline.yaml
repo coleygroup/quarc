@@ -1,9 +1,9 @@
-base_model_dir: "/home/xiaoqis/projects/cond_rec_clean/trained_models"
+base_model_dir: "./checkpoints"
 
 models:
   agent:
     checkpoint_path: "agent/gnn_agent_model.ckpt"
-    model_class: "AgentGNNWithReactionClass"
+    model_class: "AgentGNNWithRxnClass"
     model_type: "gnn"
     params:
       gnn_depth: 2

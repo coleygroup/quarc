@@ -12,7 +12,7 @@ from quarc.cli.train_args import TrainArgs
 from quarc.models.modules.ffn_heads import (
     FFNBaseHead,
     FFNAgentAmountHead,
-    FFNAgentHeadWithReactionClass,
+    FFNAgentHeadWithRxnClass,
     FFNAgentHead,
     FFNReactantAmountHead,
     FFNTemperatureHead,
@@ -30,6 +30,7 @@ class BaseFFN(pl.LightningModule):
         init_lr: float = 1e-4,
         max_lr: float = 1e-3,
         final_lr: float = 1e-4,
+        gamma: float = 0.98,
     ):
         super().__init__()
         if metrics is None:
@@ -45,6 +46,7 @@ class BaseFFN(pl.LightningModule):
         self.init_lr = init_lr
         self.max_lr = max_lr
         self.final_lr = final_lr
+        self.gamma = gamma
 
     def forward(self, FP_inputs: Tensor, agent_input: Tensor) -> Tensor:
         return self.predictor(FP_inputs, agent_input)
@@ -101,6 +103,7 @@ class BaseFFN(pl.LightningModule):
 
     def configure_optimizers(self):
         opt = Adam(self.parameters(), lr=self.init_lr)
+
         scheduler = OneCycleLR(
             opt,
             max_lr=self.max_lr,
@@ -127,7 +130,7 @@ class BaseFFN(pl.LightningModule):
             "TemperatureFFN": FFNTemperatureHead,
             "ReactantAmountFFN": FFNReactantAmountHead,
             "AgentAmountFFN": FFNAgentAmountHead,
-            "AgentFFNWithReactionClass": FFNAgentHeadWithReactionClass,
+            "AgentFFNWithRxnClass": FFNAgentHeadWithRxnClass,
         }
         predictor_cls = PREDICTOR_MAP.get(cls.__name__)
         if predictor_cls is None:
@@ -163,17 +166,98 @@ class BaseFFN(pl.LightningModule):
         return model
 
 
-class AgentFFNWithReactionClass(BaseFFN):
+class AgentFFN(BaseFFN):
+    """FFN model for agent prediction with sample weights"""
+
+    def __init__(self, predictor: FFNAgentHead, *args, **kwargs):
+        if not isinstance(predictor, FFNAgentHead):
+            raise TypeError("AgentFFN requires FFNAgentHead")
+        super().__init__(predictor, *args, **kwargs)
+
+    def loss_fn(self, preds: Tensor, targets: Tensor, weights: Tensor) -> Tensor:
+        loss = self.criterion(preds, targets)
+        return (loss * weights).mean()
+
+    def training_step(self, batch, batch_idx):
+
+        FP_inputs, a_inputs, targets, weights = batch
+        preds = self(FP_inputs, a_inputs)
+        l = self.loss_fn(preds, targets, weights)
+        self.log(
+            "train_loss",
+            l,
+            batch_size=len(batch[0]),
+            prog_bar=True,
+            on_step=False,
+            on_epoch=True,
+            sync_dist=True,
+        )
+        return l
+
+    def validation_step(self, batch, batch_idx):
+        FP_inputs, a_inputs, targets = batch
+        preds = self(FP_inputs, a_inputs)
+        dummy_weights = torch.ones(FP_inputs.shape[0]).to(preds.device)
+
+        val_loss = self.loss_fn(preds, targets, dummy_weights)
+        self.log(
+            "val_loss",
+            val_loss,
+            batch_size=len(batch[0]),
+            prog_bar=True,
+            on_step=False,
+            on_epoch=True,
+            sync_dist=True,
+        )
+
+        for metric_name, metric_f in self.metrics.items():
+            if isinstance(metric_f, nn.Module):
+                metric_f = metric_f.to(self.device)
+
+            if "multilabel" in metric_name:
+                metric = metric_f(F.sigmoid(preds), targets)
+            else:
+                metric = metric_f(preds, targets)
+            self.log(metric_name, metric, batch_size=len(batch[0]), on_epoch=True, sync_dist=True)
+        return val_loss
+
+    def configure_optimizers(self):
+        """For training, count total steps for augmented training data"""
+        opt = Adam(self.parameters(), lr=self.init_lr)
+
+        # total_steps = self.steps_per_epoch * self.max_epochs
+        # scheduler = OneCycleLR(
+        #     opt,
+        #     max_lr=self.init_lr * 10,
+        #     total_steps=total_steps,
+        #     pct_start=0.3,
+        #     div_factor=10,
+        #     final_div_factor=1e4,
+        #     anneal_strategy="cos",
+        # )
+
+        lr_sched = ExponentialLR(optimizer=opt, gamma=self.gamma)
+
+        return {
+            "optimizer": opt,
+            "lr_scheduler": {
+                "scheduler": lr_sched,
+                "interval": "step",
+            },
+        }
+
+
+class AgentFFNWithRxnClass(BaseFFN):
     """FFN model for agent prediction with sample weights"""
 
     def __init__(
         self,
-        predictor: FFNAgentHeadWithReactionClass,
+        predictor: FFNAgentHeadWithRxnClass,
         *args,
         **kwargs,
     ):
-        if not isinstance(predictor, FFNAgentHeadWithReactionClass):
-            raise TypeError("AgentFFN requires FFNAgentHeadWithReactionClass")
+        if not isinstance(predictor, FFNAgentHeadWithRxnClass):
+            raise TypeError("AgentFFN requires FFNAgentHeadWithRxnClass")
         super().__init__(predictor, *args, **kwargs)
 
     def loss_fn(self, preds: Tensor, targets: Tensor, weights: Tensor) -> Tensor:
@@ -230,7 +314,7 @@ class AgentFFNWithReactionClass(BaseFFN):
         """For training, count total steps for augmented training data"""
         opt = Adam(self.parameters(), lr=self.init_lr)
 
-        lr_sched = ExponentialLR(optimizer=opt, gamma=0.98)
+        lr_sched = ExponentialLR(optimizer=opt, gamma=self.gamma)
 
         return {"optimizer": opt, "lr_scheduler": lr_sched}
 

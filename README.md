@@ -9,9 +9,9 @@ QUARC is a data-driven model for recommending agents, temperature, and equivalen
 > [!IMPORTANT]
 > The QUARC models used in the paper rely on the **[NameRxn](https://www.nextmovesoftware.com/namerxn.html) reaction classification codes** as part of the model input. Specifically, the reaction class is encoded as a one-hot vector, requiring access to the full NameRxn code mapping.
 >
-> Users with Pistachio license may contact the authors (xiaoqis@mit.edu) to get the classification mapping file used in this work.
+> Users with a Pistachio license can access the **2023Q4 version** of `Pistachio Reaction Types.csv` directly (2271 NameRxn classes + Unrecognized). Otherwise, they may contact the authors (xiaoqis@mit.edu) to obtain the specific files used in this work.
 >
-> For users wihtout NameRxn access, we are preparing an open-source version that removes this dependency. More details will be available on [ASKCOSv2](https://gitlab.com/mlpds_mit/askcosv2) soon.
+> For users wihtout NameRxn access, we are preparing an open-source version that removes this dependency. The back-end service is planned to be integrated into [ASKCOSv2](https://gitlab.com/mlpds_mit/askcosv2)'s july release ([release note](https://askcos-docs.mit.edu/release-notes/8-Changelogs.html)). In the meantime, an early-access implementation is also avaliable at the [quarc-oss](https://github.com/Xiaoqi-Sun/quarc-oss) repo.
 
 ## Quick Start (Inference Only)
 
@@ -31,6 +31,8 @@ export PISTACHIO_NAMERXN_PATH="/path/to/your/Pistachio Reaction Types.csv"
 # 3. Optional: Set data paths (uses defaults if not set)
 export DATA_ROOT="~/quarc/data"
 ```
+
+_The 2023Q4 version of  `Pistachio Reaction Types.csv` is required for compatibility with the pretrained models (requires 2272 classes for reaction class encoding). Using a different version may cause the model to fail._
 
 ### Step 2: Run Predictions
 

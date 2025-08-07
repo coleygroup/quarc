@@ -140,6 +140,8 @@ __pycache__/
 *.pyc
 /.ipynb_checkpoints/
 
+*.ckpt
+*.pth
 
 *.json
 *.txt
@@ -162,6 +164,8 @@ __pycache__/
 .vscode/
 .cursor/
 temp/
+references/
+CLAUDE.md
 
 # Pistachio related files
 densities_clean_new.tsv

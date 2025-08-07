@@ -168,10 +168,6 @@ class BaseGNN(pl.LightningModule):
             opt,
             max_lr=self.max_lr,
             total_steps=self.trainer.estimated_stepping_batches,
-            pct_start=0.3,
-            div_factor=10,
-            final_div_factor=1e4,
-            anneal_strategy="cos",
         )
 
         return {
@@ -290,10 +286,10 @@ class AgentGNN(BaseGNN):
             self.log(metric_name, metric, batch_size=len(batch[0]), on_epoch=True, sync_dist=True)
         return val_loss
 
-    def configure_optimizers(self):
-        opt = Adam(self.parameters(), lr=self.init_lr)
-        lr_sched = ExponentialLR(optimizer=opt, gamma=0.98)
-        return {"optimizer": opt, "lr_scheduler": lr_sched}
+    # def configure_optimizers(self):
+    #     opt = Adam(self.parameters(), lr=self.init_lr)
+    #     lr_sched = ExponentialLR(optimizer=opt, gamma=0.98)
+    #     return {"optimizer": opt, "lr_scheduler": lr_sched}
 
 
 class AgentGNNWithRxnClass(BaseGNN):
@@ -353,10 +349,10 @@ class AgentGNNWithRxnClass(BaseGNN):
             self.log(metric_name, metric, batch_size=len(batch[0]), on_epoch=True, sync_dist=True)
         return val_loss
 
-    def configure_optimizers(self):
-        opt = Adam(self.parameters(), lr=self.init_lr)
-        lr_sched = ExponentialLR(optimizer=opt, gamma=0.98)
-        return {"optimizer": opt, "lr_scheduler": lr_sched}
+    # def configure_optimizers(self):
+    #     opt = Adam(self.parameters(), lr=self.init_lr)
+    #     lr_sched = ExponentialLR(optimizer=opt, gamma=0.98)
+    #     return {"optimizer": opt, "lr_scheduler": lr_sched}
 
 
 class TemperatureGNN(BaseGNN):

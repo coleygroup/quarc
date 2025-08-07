@@ -247,7 +247,6 @@ def run_stage3_filters(config):
     ratio_range = config["stage_3_filter"]["ratio_range"]
 
     filters = [
-        # (filter_by_reactant_num, "multiple_reactants"), throws away ~25% of data (single reactant reactions got thrown away, not good)
         (filter_by_unique_reactant, "unique_reactants"),
         (filter_by_reactant_amount_existence, "reactant_amount_existence"),
         (
@@ -326,3 +325,81 @@ def run_stage4_filters(config):
     # save filter meta data
     with open(output_dir / "filter_stats.json", "w") as f:
         json.dump(filter_metadata, f, indent=2)
+
+
+def run_all_filters(config):
+    """Run all filters"""
+    logger.info("---Running all filters---")
+    input_dir = Path(config["all_filters"]["input_dir"])
+    output_dir = Path(config["all_filters"]["output_dir"])
+    output_dir.mkdir(exist_ok=True, parents=True)
+
+    # stage 1 filters
+    filters = [
+        (filter_by_agent_existence, "agent_existence"),
+        (filter_by_unique_agent, "unique_agent"),
+        (filter_by_agent_amount_existence, "agent_amount"),
+    ]
+
+    # stage 2 filters
+    filters.extend(
+        [
+            (filter_by_temperature, "temperature_existence"),
+            (
+                lambda rxn: filter_by_temperature_range(
+                    rxn,
+                    lower_bound=config["stage_2_filter"]["temperature_range"]["lower"],
+                    upper_bound=config["stage_2_filter"]["temperature_range"]["upper"],
+                ),
+                "temperature_range",
+            ),
+        ]
+    )
+
+    # stage 3 filters
+    filters.extend(
+        [
+            (filter_by_unique_reactant, "unique_reactants"),
+            (filter_by_reactant_amount_existence, "reactant_amount_existence"),
+            (
+                lambda rxn: filter_by_reactant_ratio_range(
+                    rxn,
+                    min_ratio=config["stage_3_filter"]["ratio_range"]["lower"],
+                    max_ratio=config["stage_3_filter"]["ratio_range"]["upper"],
+                ),
+                "reactant_ratio_range",
+            ),
+        ]
+    )
+
+    # stage 4 filters
+    filters.extend(
+        [
+            (filter_by_agent_existence, "agent_existence"),
+            (filter_by_agent_amount_existence, "agent_amount_existence"),
+            (filter_by_reactant_amount_existence, "reactant_amount_existence"),
+            (filter_by_unique_agent, "unique_agents"),
+            (
+                lambda rxn: filter_by_agent_ratio_range(
+                    rxn,
+                    min_ratio=config["stage_4_filter"]["ratio_range"]["lower"],
+                    max_ratio=config["stage_4_filter"]["ratio_range"]["upper"],
+                ),
+                "agent_ratio_range",
+            ),
+            (filter_by_nonsolvent_high_ratio, "nonsolvent_high_ratio"),
+        ]
+    )
+
+    for split in ["train", "val", "test"]:
+        input_path = input_dir / f"full_{split}.pickle"
+        with open(input_path, "rb") as f:
+            data = pickle.load(f)
+
+        filtered_data, _ = apply_filter_group(data, filters, f"overlap_{split}")
+
+        output_path = output_dir / f"overlap_{split}.pickle"
+        with open(output_path, "wb") as f:
+            pickle.dump(filtered_data, f, pickle.HIGHEST_PROTOCOL)
+
+        del data, filtered_data

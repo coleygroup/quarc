@@ -108,10 +108,6 @@ class BaseFFN(pl.LightningModule):
             opt,
             max_lr=self.max_lr,
             total_steps=self.trainer.estimated_stepping_batches,
-            pct_start=0.3,
-            div_factor=10,
-            final_div_factor=1e4,
-            anneal_strategy="cos",
         )
 
         return {
@@ -221,30 +217,11 @@ class AgentFFN(BaseFFN):
             self.log(metric_name, metric, batch_size=len(batch[0]), on_epoch=True, sync_dist=True)
         return val_loss
 
-    def configure_optimizers(self):
-        """For training, count total steps for augmented training data"""
-        opt = Adam(self.parameters(), lr=self.init_lr)
+    # def configure_optimizers(self):
+    #     opt = Adam(self.parameters(), lr=self.init_lr)
+    #     lr_sched = ExponentialLR(optimizer=opt, gamma=self.gamma)
 
-        # total_steps = self.steps_per_epoch * self.max_epochs
-        # scheduler = OneCycleLR(
-        #     opt,
-        #     max_lr=self.init_lr * 10,
-        #     total_steps=total_steps,
-        #     pct_start=0.3,
-        #     div_factor=10,
-        #     final_div_factor=1e4,
-        #     anneal_strategy="cos",
-        # )
-
-        lr_sched = ExponentialLR(optimizer=opt, gamma=self.gamma)
-
-        return {
-            "optimizer": opt,
-            "lr_scheduler": {
-                "scheduler": lr_sched,
-                "interval": "step",
-            },
-        }
+    #     return {"optimizer": opt, "lr_scheduler": lr_sched}
 
 
 class AgentFFNWithRxnClass(BaseFFN):
@@ -310,13 +287,11 @@ class AgentFFNWithRxnClass(BaseFFN):
             self.log(metric_name, metric, batch_size=len(batch[0]), on_epoch=True, sync_dist=True)
         return val_loss
 
-    def configure_optimizers(self):
-        """For training, count total steps for augmented training data"""
-        opt = Adam(self.parameters(), lr=self.init_lr)
+    # def configure_optimizers(self):
+    #     opt = Adam(self.parameters(), lr=self.init_lr)
+    #     lr_sched = ExponentialLR(optimizer=opt, gamma=self.gamma)
 
-        lr_sched = ExponentialLR(optimizer=opt, gamma=self.gamma)
-
-        return {"optimizer": opt, "lr_scheduler": lr_sched}
+    #     return {"optimizer": opt, "lr_scheduler": lr_sched}
 
 
 class TemperatureFFN(BaseFFN):

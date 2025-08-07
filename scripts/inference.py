@@ -1,8 +1,10 @@
 import argparse
 import json
+import pickle
 import torch
 from typing import Any
 import warnings
+from pathlib import Path
 
 warnings.filterwarnings("ignore")
 
@@ -18,143 +20,154 @@ from quarc.utils.smiles_utils import parse_rxn_smiles
 from quarc.predictors.model_factory import load_models_from_yaml
 from quarc.predictors.multistage_predictor import EnumeratedPredictor
 from quarc.settings import load as load_settings
+from quarc.cli.quarc_parser import add_predict_opts
 
 
-def format_predictions(predictions, agent_encoder: AgentEncoder, top_k: int = 5) -> dict[str, Any]:
+def convert_json_to_reactions(data: list[dict]) -> list[ReactionDatum]:
+    """Convert JSON input to ReactionDatum objects"""
+
+    reactions = []
+    for i, item in enumerate(data):
+        reactants, agents, products = parse_rxn_smiles(item["rxn_smiles"])
+
+        reactions.append(
+            ReactionDatum(
+                rxn_smiles=item["rxn_smiles"],
+                reactants=[AgentRecord(smiles=r, amount=None) for r in reactants],
+                agents=[AgentRecord(smiles=a, amount=None) for a in agents],
+                products=[AgentRecord(smiles=p, amount=None) for p in products],
+                rxn_class=item["rxn_class"],
+                document_id=item.get("doc_id", f"reaction_{i}"),
+                date=None,
+                temperature=None,
+            )
+        )
+
+    return reactions
+
+
+def format_predictions(predictions, agent_encoder: AgentEncoder) -> dict[str, Any]:
+    """Format prediction results for JSON output"""
     binning_config = BinningConfig.default()
     temp_labels = binning_config.get_bin_labels("temperature")
     reactant_labels = binning_config.get_bin_labels("reactant")
     agent_labels = binning_config.get_bin_labels("agent")
 
-    results = {
+    reactants_smiles, _, _ = parse_rxn_smiles(predictions.rxn_smiles)
+
+    formatted_predictions = []
+    for i, pred in enumerate(predictions.predictions):
+        agent_amounts = [
+            {"agent": agent_encoder.decode([agent_idx])[0], "amount_range": agent_labels[bin_idx]}
+            for agent_idx, bin_idx in pred.agent_amount_bins
+        ]
+
+        reactant_amounts = [
+            {"reactant": reactant_smi, "amount_range": reactant_labels[bin_idx]}
+            for reactant_smi, bin_idx in zip(reactants_smiles, pred.reactant_bins)
+        ]
+
+        formatted_predictions.append(
+            {
+                "rank": i + 1,
+                "score": pred.score,
+                "agents": agent_encoder.decode(pred.agents),
+                "temperature": temp_labels[pred.temp_bin],
+                "reactant_amounts": reactant_amounts,
+                "agent_amounts": agent_amounts,
+                "raw_scores": getattr(pred, "meta", {}),
+            }
+        )
+
+    return {
         "doc_id": predictions.doc_id,
         "rxn_class": predictions.rxn_class,
         "rxn_smiles": predictions.rxn_smiles,
-        "predictions": [],
+        "predictions": formatted_predictions,
     }
-    reactants_smiles, _, _ = parse_rxn_smiles(predictions.rxn_smiles)
-
-    for i, pred in enumerate(predictions.predictions[:top_k]):
-        agent_smiles = agent_encoder.decode(pred.agents)
-        temp_label = temp_labels[pred.temp_bin]
-        reactant_labels_list = [reactant_labels[bin_idx] for bin_idx in pred.reactant_bins]
-
-        agent_amounts = []
-        for agent_idx, bin_idx in pred.agent_amount_bins:
-            agent_smi = agent_encoder.decode([agent_idx])[0]
-            amount_label = agent_labels[bin_idx]
-            agent_amounts.append({"agent": agent_smi, "amount_range": amount_label})
-
-        reactant_amounts = []
-        for reactant_smi, reactant_label in zip(reactants_smiles, reactant_labels_list):
-            reactant_amounts.append({"reactant": reactant_smi, "amount_range": reactant_label})
-
-        prediction = {
-            "rank": i + 1,
-            "score": pred.score,
-            "agents": agent_smiles,
-            "temperature": temp_label,
-            "reactant_amounts": reactant_amounts,
-            "agent_amounts": agent_amounts,
-            "raw_scores": pred.meta if hasattr(pred, "meta") else {},
-        }
-        results["predictions"].append(prediction)
-
-    return results
 
 
-def main():
-    parser = argparse.ArgumentParser(description="QUARC Inference")
-    parser.add_argument("--input", "-i", required=True, help="Input JSON file with reactions")
-    parser.add_argument("--output", "-o", required=True, help="Output JSON file for predictions")
-    parser.add_argument(
-        "--config",
-        "-c",
-        default="ffn_pipeline.yaml",
-        help="Pipeline config (ffn_pipeline.yaml or gnn_pipeline.yaml)",
-    )
-    parser.add_argument(
-        "--top-k", "-k", type=int, default=5, help="Number of top predictions to return"
-    )
-    parser.add_argument("--device", default="auto", help="Device to use (cpu, cuda, auto)")
-
-    args = parser.parse_args()
-
-    cfg = load_settings()
-
-    if args.device == "auto":
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    else:
-        device = torch.device(args.device)
-
-    # Load supporting components
-    a_enc = AgentEncoder(
+def load_encoders(cfg):
+    agent_encoder = AgentEncoder(
         class_path=cfg.processed_data_dir / "agent_encoder/agent_encoder_list.json"
     )
-    a_standardizer = AgentStandardizer(
+    agent_standardizer = AgentStandardizer(
         conv_rules=cfg.processed_data_dir / "agent_encoder/agent_rules_v1.json",
         other_dict=cfg.processed_data_dir / "agent_encoder/agent_other_dict.json",
     )
     rxn_encoder = ReactionClassEncoder(class_path=cfg.pistachio_namerxn_path)
     featurizer = CondensedGraphOfReactionFeaturizer(mode_="REAC_DIFF")
+    return agent_encoder, agent_standardizer, rxn_encoder, featurizer
 
-    # Load models
-    models, model_types, weights = load_models_from_yaml(cfg.checkpoints_dir / args.config, device)
 
-    # Setup predictor
+def load_data(input_path: str) -> list[ReactionDatum]:
+    # json of just smiles + rxn class
+    if input_path.endswith(".json"):
+        with open(input_path, "r") as f:
+            data = json.load(f)
+        reactions = convert_json_to_reactions(data)
+
+    # e.g., overlap_val already in ReactionDatum format
+    elif input_path.endswith(".pickle") or input_path.endswith(".pkl"):
+        with open(input_path, "rb") as f:
+            reactions = pickle.load(f)
+    else:
+        raise ValueError(f"Unsupported file type: {input_path}")
+
+    return reactions
+
+
+def run_inference(input_path: str, output_path: str, config_path: str, top_k: int):
+    """Run complete inference pipeline"""
+    cfg = load_settings()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # load encoders
+    agent_encoder, agent_standardizer, rxn_encoder, featurizer = load_encoders(cfg)
+
+    # load models
+    models, model_types, weights = load_models_from_yaml(config_path, device)
+
+    # load predictor
     predictor = EnumeratedPredictor(
         agent_model=models["agent"],
         temperature_model=models["temperature"],
         reactant_amount_model=models["reactant_amount"],
         agent_amount_model=models["agent_amount"],
         model_types=model_types,
-        agent_encoder=a_enc,
+        agent_encoder=agent_encoder,
         device=device,
         weights=weights["use_top_5"],
         use_geometric=weights["use_geometric"],
     )
 
-    # Load and convert input to ReactionDatum objects
-    with open(args.input, "r") as f:
-        input_data = json.load(f)
-
-    reactions = []
-    for i, item in enumerate(input_data):
-        rxn_smiles = item["rxn_smiles"]
-        rxn_class = item["rxn_class"]
-        doc_id = item.get("doc_id", f"reaction_{i}")
-
-        reactants, agents, products = parse_rxn_smiles(rxn_smiles)
-
-        reactions.append(
-            ReactionDatum(
-                rxn_smiles=rxn_smiles,
-                reactants=[AgentRecord(smiles=r, amount=None) for r in reactants],
-                agents=[AgentRecord(smiles=a, amount=None) for a in agents],
-                products=[AgentRecord(smiles=p, amount=None) for p in products],
-                rxn_class=rxn_class,
-                document_id=doc_id,
-                date=None,
-                temperature=None,
-            )
-        )
-
+    # load data
+    reactions = load_data(input_path)
     dataset = EvaluationDatasetFactory.for_inference(
         data=reactions,
-        agent_standardizer=a_standardizer,
-        agent_encoder=a_enc,
+        agent_standardizer=agent_standardizer,
+        agent_encoder=agent_encoder,
         rxn_encoder=rxn_encoder,
         featurizer=featurizer,
     )
 
-    all_results = []
-    for reaction in dataset:
-        predictions = predictor.predict(reaction, top_k=args.top_k)
-        result = format_predictions(predictions, a_enc, top_k=args.top_k)
-        all_results.append(result)
+    # run inference
+    results = [
+        format_predictions(predictor.predict(r, top_k=top_k), agent_encoder) for r in dataset
+    ]
 
-    with open(args.output, "w") as f:
-        json.dump(all_results, f, indent=2)
+    # save results
+    with open(output_path, "w") as f:
+        json.dump(results, f, indent=2)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="QUARC Inference")
+    add_predict_opts(parser)
+
+    args, unknown = parser.parse_known_args()
+
+    run_inference(args.input, args.output, args.config_path, args.top_k)
 
 
 if __name__ == "__main__":

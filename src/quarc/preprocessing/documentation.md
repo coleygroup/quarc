@@ -5,32 +5,39 @@ Data preprocessing pipeline for QUARC.
 ## Overview
 
 ```bash
-python preprocess.py --config preprocess_config.json [--chunk_json data/chunks] [--collect_dedup] [--init_filter] [--con_filter] [--all] [--max-cpu N]
+python scripts/preprocess.py --config configs/preprocess_config.yaml
+[--chunk-json] [--collect-dedup] [--generate-vocab] [--init-filter] [--split] [--stage1-filter] [--stage2-filter] [--stage3-filter] [--stage4-filter] [--all-filters] [--all]
 ```
 
 The preprocessing pipeline consists of the following steps:
 
-```python
-   Step 0: Raw JSON Data → Chunks
+```
+   Step 1: Data Organization (--chunk-json)
    ├── Create initial chunks from raw JSON
    └── Group chunks for efficient processing
 
-   Step 1: Data Collection & Deduplication
+   Step 2: Data Collection & Deduplication (--collect-dedup)
    ├── Process and validate reactions
    ├── Parallel collection if multiple CPUs
    └── Final deduplication across all data
 
-   Step 2: Agent Classification
-   └── Generate agent classes/vocabulary
+   Step 3: Generate Agent Vocabulary (--generate-vocab)
+   └── Generate agent classes/vocabulary from collected data
 
-   Step 3: Initial Filtering
+   Step 4: Initial Filtering (--init-filter)
    └── Basic reaction validation/filtering
 
-   Step 4: Condition Filtering
-   └── Advanced condition-based filtering
+   Step 5: Train/Val/Test Split (--split)
+   └── Split filtered data by document (75:5:20)
+
+   Step 6: Stage-Specific Filtering (--stage1-filter, --stage2-filter, --stage3-filter, --stage4-filter)
+   └── Apply stage-specific filters for each model
+
+   Step 7: Generate Overlap Data (--all-filters)
+   └── Create overlap dataset containing reactions valid for all stages
 ```
 
-## Step 1: Create data chunks from raw JSON files
+## Step 1: Data Organization (--chunk-json)
 
 The raw data comes from Pistachio database extracts (pistachio.zip) with the following structure:
 
@@ -48,6 +55,7 @@ pistachio/
 The chunking process happens in two stages:
 
 1. **Initial Chunking**: Convert individual reaction records from raw JSON files into manageable chunks. Each chunk is saved as a pickle file named `{source}_{year}.pickle`.
+
    - Input: pistachio/extract/
    - Output: 23Q2_dump/
 
@@ -55,7 +63,7 @@ The chunking process happens in two stages:
    - Input: 23Q2_dump/
    - Output: 23Q2_grouped/
 
-## Step 2: Collect & deduplicate pistachio data
+## Step 2: Data Collection & Deduplication (--collect-dedup)
 
 First collect key information from ~15M reactions (with duplicates). Then deduplicate at _**condition-level**_. If two reactions have the same reactants and agents, but with different temperature or different amount, they will considered as different.
 
@@ -87,22 +95,27 @@ The component information comes from two sources:
 #### Processing Steps
 
 1. **Quantity Processing**
+
    - Convert all quantities to moles using `preprocess_quantities.py`
    - Handle mixtures and solutions by splitting into constituents
    - Store converted quantities as intermediate amounts for matching.
 
 2. **Reaction Quality Control**
+
    - Verify each reaction must have reactants and products
    - Ensure reaction performs a transformation (products not in reactants)
    - Check for no overlap between reaction and agent sets
 
 3. **Component Matching**
+
    - **Forward Matching**: Check if each item in intermediate amounts is part of reaction SMILES
+
      - Compare each intermed_amount item against reactant, agent, and product sets, which are parsed from reaction_SMILES (stereo removed)
      - Return matched_reactants, match_agents, and match_products, and unmatched components from intermed_amounts.
      - Allow forward mismatches (e.g., quenching solvents may appear in components). Treat agents defined by reaction SMILES with priority.
 
    - **Reverse Matching**: Verify all parsed sets from reaction SMILES are covered by intermed_amounts
+
      - This could happen when SMILES parsing is incorrect, the reaction is not valid. So if a `ReverseMismachError` is raised, this reaction will be rejected.
 
    - **Merging**: The matched reactants, agents, and products with smiles and converted amount will be saved to appropriate `reactants`, `agents`, and `products`.
@@ -112,6 +125,7 @@ The component information comes from two sources:
 Deduplication occurs in two phases:
 
 1. **Local Deduplication**: Within each chunk during data collection
+
    - Uses pandas `drop_duplicates()`
    - Considers reactions identical only if they have matching SMILES and conditions
 
@@ -119,7 +133,7 @@ Deduplication occurs in two phases:
    - Merges locally deduplicated chunks
    - Performs final deduplication before filtering
 
-## Step 3: Generate Agent Vocabulary
+## Step 3: Generate Agent Vocabulary (--generate-vocab)
 
 First count agent distribtuion **_only from agents with amounts_** for higher quality of labels. If not, will encounter a lot of encoding issues inlcuding ".O"
 
@@ -128,24 +142,26 @@ First count agent distribtuion **_only from agents with amounts_** for higher qu
 - For metal {Pd, Rh, Pt, Ni, Ru, Ir, Fe, Ag, } containing agents, lower the threshold to 50, and add those rare agents to the "other\_{Pd/Rh/...} category (`preprocessingv2/`)
 - Append common solvent that might have been missed
 
-*Implementation Notes:*
+_Implementation Notes:_
 
 - Counting frequency using agents with amounts only could underestimate agents common globally but don't have a lot of quantity information
 - It's also problematic if quantity calculation failed
 - Some remedies added for v3 are (1) add missing densities and (2) append remaining common solvents (have curated a longer list of common solvents according `densities_clean_new.tsv`). For detailed analysis and rationale, check `notebooks/01_agent_generation_analysis`
 
-## Step 4: Initial Reaction Quality Control
+## Step 4: Initial Filtering (--init-filter)
 
-This step applies various filters to ensure data quality. All thresholds can be configured in `configs.yaml`.
+This step applies various filters to ensure data quality. All thresholds can be configured in `configs/preprocess_config.yaml`.
 
 ### Required Filters:
 
 1. **Component Length**
+
    - Products: Exactly 1 product
    - Reactants: Between 1-5 reactants
    - Agents: Between 0-5 agents
 
 2. **Molecule Size**
+
    - Maximum 50 atoms for reactants
    - Maximum 50 atoms for products
    - RDKit parsability check for all molecules
@@ -160,6 +176,7 @@ This step applies various filters to ensure data quality. All thresholds can be 
 ### Optional Strict Filters:
 
 1. **Solvent Validation** (removes ~20% of data)
+
    - Check solvent presence in reactants/agents
    - Note: Optional due to inconsistent solvent handling in source data
      (e.g., work-up solvents, solvent mixtures)
@@ -167,14 +184,21 @@ This step applies various filters to ensure data quality. All thresholds can be 
 2. **Reaction Classification** (removes ~20% of data)
    - Remove unrecognized reactions (class=0.0)
 
-## Step 4: Train/val/test (75:5:20) by document
+## Step 5: Train/Val/Test Split (--split)
 
-Split the filtered deduplicated data by documents. For more balanced splits, use group documents by size ranges. Use a 75:5:20 train/val/test split.
-filtered_dedup_data -> full_train, full_val, full_test.pickle
+Split the filtered deduplicated data by documents. For more balanced splits, group documents by size ranges. Use a 75:5:20 train/val/test split.
 
-## Step 5: Stage-Specific Data Filtering
+**Input:** `filtered_dedup_data.pickle`
+**Output:** `full_train.pickle`, `full_val.pickle`, `full_test.pickle`
+
+## Step 6: Stage-Specific Data Filtering
 
 The full training data is filtered separately for each stage with specific requirements:
+
+- `--stage1-filter`: Agent prediction filtering
+- `--stage2-filter`: Temperature prediction filtering
+- `--stage3-filter`: Reactant amount prediction filtering
+- `--stage4-filter`: Agent amount prediction filtering
 
 ### stage_1_data_train
 
@@ -189,6 +213,7 @@ The full training data is filtered separately for each stage with specific requi
 ### stage_3_data_train
 
 <!-- - [ ] multiple reactants: At least 2 reactants. Removed because unimolecular reaction should be considered as well -->
+
 - [x] unique reactants: All reactants must be unique
 - [x] reactant amount existence: All reactants must have quantity information (except single-reactant cases)
 - [x] reactant ratio range: All molar ratios must be within 0 to 7
@@ -201,7 +226,16 @@ The full training data is filtered separately for each stage with specific requi
 - [x] agent ratio range: Agent molar ratios (relative to limiting reactant) must be within 0.001 to 1000 (upper bound for solvents only)
 - [x] nonsolvent high ratio: Upper bound of 10 for non-solvent agents
 
-Note: These same filters are applied to global_val and global_test sets.
+Note: These same filters are applied to validation and test sets.
+
+## Step 7: Generate Overlap Data (--all-filters)
+
+The `--all-filters` option creates a special "overlap" dataset containing only reactions that have records for all stages. This overlap dataset is used for:
+
+- Pipeline weight optimization
+- End-to-end evaluation
+
+**Output:** `overlap/overlap_train.pickle`, `overlap/overlap_val.pickle`, `overlap/overlap_test.pickle`
 
 ## Preprocessing Roadmap
 
@@ -227,11 +261,13 @@ graph TD
         H2[stages/stage2]
         H3[stages/stage3]
         H4[stages/stage4]
+        H5[stages/overlap]
     end
 
     splits -->|stage 1 filters| H1
     splits -->|stage 2 filters| H2
     splits -->|stage 3 filters| H3
     splits -->|stage 4 filters| H4
+    splits -->|all filters| H5
 
 ```

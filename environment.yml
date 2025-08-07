@@ -1,154 +1,155 @@
-name: quarc
+name: quarc-env
 channels:
   - conda-forge
 dependencies:
-  - _libgcc_mutex=0.1
-  - _openmp_mutex=4.5
-  - asttokens=3.0.0
-  - brotli=1.1.0
-  - brotli-bin=1.1.0
-  - bzip2=1.0.8
-  - ca-certificates=2025.7.14
-  - cairo=1.18.0
-  - chardet=5.2.0
-  - comm=0.2.2
-  - contourpy=1.3.2
-  - cycler=0.12.1
-  - debugpy=1.8.15
-  - decorator=5.2.1
-  - exceptiongroup=1.3.0
-  - executing=2.2.0
-  - faiss=1.7.4
-  - font-ttf-dejavu-sans-mono=2.37
-  - font-ttf-inconsolata=3.000
-  - font-ttf-source-code-pro=2.038
-  - font-ttf-ubuntu=0.83
-  - fontconfig=2.15.0
-  - fonts-conda-ecosystem=1
-  - fonts-conda-forge=1
-  - fonttools=4.59.0
-  - freetype=2.13.3
-  - freetype-py=2.3.0
-  - greenlet=3.2.3
-  - icu=73.2
-  - importlib-metadata=8.7.0
-  - ipykernel=6.29.5
-  - ipython=9.4.0
-  - ipython_pygments_lexers=1.1.1
-  - jedi=0.19.2
-  - jupyter_client=8.6.3
-  - jupyter_core=5.8.1
-  - keyutils=1.6.1
-  - kiwisolver=1.4.8
-  - krb5=1.21.3
-  - lcms2=2.17
-  - ld_impl_linux-64=2.44
-  - lerc=4.0.0
-  - libblas=3.9.0
-  - libboost=1.82.0
-  - libboost-python=1.82.0
-  - libbrotlicommon=1.1.0
-  - libbrotlidec=1.1.0
-  - libbrotlienc=1.1.0
-  - libcblas=3.9.0
-  - libdeflate=1.24
-  - libedit=3.1.20250104
-  - libexpat=2.7.1
-  - libfaiss=1.7.4
-  - libfaiss-avx2=1.7.4
-  - libffi=3.4.6
-  - libfreetype=2.13.3
-  - libfreetype6=2.13.3
-  - libgcc=15.1.0
-  - libgcc-ng=15.1.0
-  - libgfortran=15.1.0
-  - libgfortran5=15.1.0
-  - libglib=2.84.2
-  - libgomp=15.1.0
-  - libiconv=1.18
-  - libjpeg-turbo=3.1.0
-  - liblapack=3.9.0
-  - liblzma=5.8.1
-  - liblzma-devel=5.8.1
-  - libnsl=2.0.1
-  - libopenblas=0.3.30
-  - libpng=1.6.50
-  - libsodium=1.0.20
-  - libsqlite=3.50.3
-  - libstdcxx=15.1.0
-  - libstdcxx-ng=15.1.0
-  - libtiff=4.7.0
-  - libuuid=2.38.1
-  - libwebp-base=1.6.0
-  - libxcb=1.17.0
-  - libzlib=1.3.1
-  - matplotlib-base=3.10.3
-  - matplotlib-inline=0.1.7
-  - munkres=1.1.4
-  - ncurses=6.5
-  - nest-asyncio=1.6.0
-  - numpy=1.26.4
-  - openjpeg=2.5.3
-  - openssl=3.5.1
-  - pandas=2.3.1
-  - parso=0.8.4
-  - pcre2=10.45
-  - pexpect=4.9.0
-  - pickleshare=0.7.5
-  - pillow=11.3.0
-  - pip=25.1.1
-  - pixman=0.46.2
-  - platformdirs=4.3.8
-  - prompt-toolkit=3.0.51
-  - pthread-stubs=0.4
-  - ptyprocess=0.7.0
-  - pure_eval=0.2.3
-  - pycairo=1.27.0
-  - pygments=2.19.2
-  - pyparsing=3.2.3
-  - python=3.11.2
-  - python-dateutil=2.9.0.post0
-  - python-tzdata=2025.2
-  - python_abi=3.11
-  - pytz=2025.2
-  - pyzmq=27.0.0
-  - qhull=2020.2
-  - rdkit=2023.09.5
-  - readline=8.2
-  - reportlab=4.4.1
-  - rlpycairo=0.2.0
-  - setuptools=80.9.0
-  - six=1.17.0
-  - sqlalchemy=2.0.41
-  - stack_data=0.6.3
-  - tk=8.6.13
-  - tornado=6.5.1
-  - traitlets=5.14.3
-  - typing-extensions=4.14.1
-  - typing_extensions=4.14.1
-  - tzdata=2025b
-  - unicodedata2=16.0.0
-  - wcwidth=0.2.13
-  - wheel=0.45.1
-  - xorg-libice=1.1.2
-  - xorg-libsm=1.2.6
-  - xorg-libx11=1.8.12
-  - xorg-libxau=1.0.12
-  - xorg-libxdmcp=1.1.5
-  - xorg-libxext=1.3.6
-  - xorg-libxrender=0.9.12
-  - xz=5.8.1
-  - xz-gpl-tools=5.8.1
-  - xz-tools=5.8.1
-  - zeromq=4.3.5
-  - zipp=3.23.0
-  - zlib=1.3.1
-  - zstd=1.5.7
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=2_gnu
+  - asttokens=3.0.0=pyhd8ed1ab_1
+  - brotli=1.1.0=hb9d3cd8_3
+  - brotli-bin=1.1.0=hb9d3cd8_3
+  - bzip2=1.0.8=h4bc722e_7
+  - ca-certificates=2025.7.14=hbd8a1cb_0
+  - cairo=1.18.0=hbb29018_2
+  - chardet=5.2.0=pyhd8ed1ab_3
+  - comm=0.2.2=pyhd8ed1ab_1
+  - contourpy=1.3.2=py311hd18a35c_0
+  - cycler=0.12.1=pyhd8ed1ab_1
+  - debugpy=1.8.15=py311hc665b79_0
+  - decorator=5.2.1=pyhd8ed1ab_0
+  - exceptiongroup=1.3.0=pyhd8ed1ab_0
+  - executing=2.2.0=pyhd8ed1ab_0
+  - faiss=1.7.4=py311h26a440e_0_cpu
+  - font-ttf-dejavu-sans-mono=2.37=hab24e00_0
+  - font-ttf-inconsolata=3.000=h77eed37_0
+  - font-ttf-source-code-pro=2.038=h77eed37_0
+  - font-ttf-ubuntu=0.83=h77eed37_3
+  - fontconfig=2.15.0=h7e30c49_1
+  - fonts-conda-ecosystem=1=0
+  - fonts-conda-forge=1=0
+  - fonttools=4.59.0=py311h3778330_0
+  - freetype=2.13.3=ha770c72_1
+  - freetype-py=2.3.0=pyhd8ed1ab_0
+  - greenlet=3.2.3=py311hfdbb021_0
+  - icu=73.2=h59595ed_0
+  - importlib-metadata=8.7.0=pyhe01879c_1
+  - ipykernel=6.29.5=pyh3099207_0
+  - ipython=9.4.0=pyhfa0c392_0
+  - ipython_pygments_lexers=1.1.1=pyhd8ed1ab_0
+  - jedi=0.19.2=pyhd8ed1ab_1
+  - jupyter_client=8.6.3=pyhd8ed1ab_1
+  - jupyter_core=5.8.1=pyh31011fe_0
+  - keyutils=1.6.1=h166bdaf_0
+  - kiwisolver=1.4.8=py311hd18a35c_1
+  - krb5=1.21.3=h659f571_0
+  - lcms2=2.17=h717163a_0
+  - ld_impl_linux-64=2.44=h1423503_1
+  - lerc=4.0.0=h0aef613_1
+  - libblas=3.9.0=32_h59b9bed_openblas
+  - libboost=1.82.0=h6fcfa73_6
+  - libboost-python=1.82.0=py311h92ebd52_6
+  - libbrotlicommon=1.1.0=hb9d3cd8_3
+  - libbrotlidec=1.1.0=hb9d3cd8_3
+  - libbrotlienc=1.1.0=hb9d3cd8_3
+  - libcblas=3.9.0=32_he106b2a_openblas
+  - libdeflate=1.24=h86f0d12_0
+  - libedit=3.1.20250104=pl5321h7949ede_0
+  - libexpat=2.7.1=hecca717_0
+  - libfaiss=1.7.4=hf47d654_0_cpu
+  - libfaiss-avx2=1.7.4=h1234567_0_cpu
+  - libffi=3.4.6=h2dba641_1
+  - libfreetype=2.13.3=ha770c72_1
+  - libfreetype6=2.13.3=h48d6fc4_1
+  - libgcc=15.1.0=h767d61c_3
+  - libgcc-ng=15.1.0=h69a702a_3
+  - libgfortran=15.1.0=h69a702a_3
+  - libgfortran5=15.1.0=hcea5267_3
+  - libglib=2.84.2=h3618099_0
+  - libgomp=15.1.0=h767d61c_3
+  - libiconv=1.18=h4ce23a2_1
+  - libjpeg-turbo=3.1.0=hb9d3cd8_0
+  - liblapack=3.9.0=32_h7ac8fdf_openblas
+  - liblzma=5.8.1=hb9d3cd8_2
+  - liblzma-devel=5.8.1=hb9d3cd8_2
+  - libnsl=2.0.1=hb9d3cd8_1
+  - libopenblas=0.3.30=pthreads_h94d23a6_0
+  - libpng=1.6.50=h943b412_0
+  - libsodium=1.0.20=h4ab18f5_0
+  - libsqlite=3.50.3=h0c1763c_0
+  - libstdcxx=15.1.0=h8f9b012_3
+  - libstdcxx-ng=15.1.0=h4852527_3
+  - libtiff=4.7.0=hf01ce69_5
+  - libuuid=2.38.1=h0b41bf4_0
+  - libwebp-base=1.6.0=hd42ef1d_0
+  - libxcb=1.17.0=h8a09558_0
+  - libzlib=1.3.1=hb9d3cd8_2
+  - matplotlib-base=3.10.3=py311h2b939e6_0
+  - matplotlib-inline=0.1.7=pyhd8ed1ab_1
+  - munkres=1.1.4=pyhd8ed1ab_1
+  - ncurses=6.5=h2d0b736_3
+  - nest-asyncio=1.6.0=pyhd8ed1ab_1
+  - numpy=1.26.4=py311h64a7726_0
+  - openjpeg=2.5.3=h5fbd93e_0
+  - openssl=3.5.1=h7b32b05_0
+  - pandas=2.3.1=py311hed34c8f_0
+  - parso=0.8.4=pyhd8ed1ab_1
+  - pcre2=10.45=hc749103_0
+  - pexpect=4.9.0=pyhd8ed1ab_1
+  - pickleshare=0.7.5=pyhd8ed1ab_1004
+  - pillow=11.3.0=py311h1322bbf_0
+  - pip=25.1.1=pyh8b19718_0
+  - pixman=0.46.2=h29eaf8c_0
+  - platformdirs=4.3.8=pyhe01879c_0
+  - prompt-toolkit=3.0.51=pyha770c72_0
+  - pthread-stubs=0.4=hb9d3cd8_1002
+  - ptyprocess=0.7.0=pyhd8ed1ab_1
+  - pure_eval=0.2.3=pyhd8ed1ab_1
+  - pycairo=1.27.0=py311h124c5f0_0
+  - pygments=2.19.2=pyhd8ed1ab_0
+  - pyparsing=3.2.3=pyhd8ed1ab_1
+  - python=3.11.2=h2755cc3_0_cpython
+  - python-dateutil=2.9.0.post0=pyhe01879c_2
+  - python-tzdata=2025.2=pyhd8ed1ab_0
+  - python_abi=3.11=8_cp311
+  - pytz=2025.2=pyhd8ed1ab_0
+  - pyzmq=27.0.0=py311h7deb3e3_0
+  - qhull=2020.2=h434a139_5
+  - rdkit=2023.09.5=py311h4c2f14b_0
+  - readline=8.2=h8c095d6_2
+  - reportlab=4.4.1=py311h9ecbd09_0
+  - rlpycairo=0.2.0=pyhd8ed1ab_0
+  - setuptools=80.9.0=pyhff2d567_0
+  - six=1.17.0=pyhd8ed1ab_0
+  - sqlalchemy=2.0.41=py311h9ecbd09_0
+  - stack_data=0.6.3=pyhd8ed1ab_1
+  - tk=8.6.13=noxft_hd72426e_102
+  - tornado=6.5.1=py311h9ecbd09_0
+  - traitlets=5.14.3=pyhd8ed1ab_1
+  - typing-extensions=4.14.1=h4440ef1_0
+  - typing_extensions=4.14.1=pyhe01879c_0
+  - tzdata=2025b=h78e105d_0
+  - unicodedata2=16.0.0=py311h9ecbd09_0
+  - wcwidth=0.2.13=pyhd8ed1ab_1
+  - wheel=0.45.1=pyhd8ed1ab_1
+  - xorg-libice=1.1.2=hb9d3cd8_0
+  - xorg-libsm=1.2.6=he73a12e_0
+  - xorg-libx11=1.8.12=h4f16b4b_0
+  - xorg-libxau=1.0.12=hb9d3cd8_0
+  - xorg-libxdmcp=1.1.5=hb9d3cd8_0
+  - xorg-libxext=1.3.6=hb9d3cd8_0
+  - xorg-libxrender=0.9.12=hb9d3cd8_0
+  - xz=5.8.1=hbcc6ac9_2
+  - xz-gpl-tools=5.8.1=hbcc6ac9_2
+  - xz-tools=5.8.1=hb9d3cd8_2
+  - zeromq=4.3.5=h3b0a872_7
+  - zipp=3.23.0=pyhd8ed1ab_0
+  - zlib=1.3.1=hb9d3cd8_2
+  - zstd=1.5.7=hb8e6e7a_2
   - pip:
       - aimsim-core==2.2.2
       - aiohappyeyeballs==2.6.1
       - aiohttp==3.12.14
       - aiosignal==1.4.0
+      - alembic==1.16.4
       - anyio==4.9.0
       - arrow==1.3.0
       - astartes==1.3.1
@@ -162,6 +163,7 @@ dependencies:
       - chemprop==2.0.0
       - click==8.2.1
       - cloudpickle==3.1.1
+      - colorlog==6.9.0
       - configargparse==1.7.1
       - croniter==1.3.15
       - dateutils==0.6.12
@@ -186,6 +188,7 @@ dependencies:
       - lightning-cloud==0.5.70
       - lightning-utilities==0.14.3
       - loguru==0.7.3
+      - mako==1.3.10
       - markdown-it-py==3.0.0
       - markupsafe==3.0.2
       - mdurl==0.1.2
@@ -209,6 +212,7 @@ dependencies:
       - nvidia-nccl-cu12==2.18.1
       - nvidia-nvjitlink-cu12==12.9.86
       - nvidia-nvtx-cu12==12.1.105
+      - optuna==4.4.0
       - ordered-set==4.1.0
       - packaging==24.2
       - padelpy==0.1.16
@@ -223,6 +227,7 @@ dependencies:
       - python-multipart==0.0.20
       - pytorch-lightning==2.5.0
       - pyyaml==6.0.2
+      - quarc==0.0.1
       - readchar==4.2.1
       - requests==2.32.4
       - rich==14.0.0
@@ -253,3 +258,4 @@ dependencies:
       - xarray==2025.7.1
       - xmod==1.8.1
       - yarl==1.20.1
+prefix: /home/xiaoqis/miniconda3/envs/quarc-env

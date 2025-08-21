@@ -18,7 +18,6 @@ from torch.nn import functional as F
 from torch.optim import Adam
 from torch.optim.lr_scheduler import OneCycleLR, CosineAnnealingLR, ExponentialLR
 
-from quarc.cli.train_args import TrainArgs
 from quarc.data.gnn_dataloader import TrainingBatch_agent
 from quarc.models.modules.gnn_heads import (
     GNNAgentAmountHead,
@@ -181,62 +180,6 @@ class BaseGNN(pl.LightningModule):
     def on_train_epoch_start(self) -> None:
         lr = self.trainer.optimizers[0].param_groups[0]["lr"]
         self.log("learning_rate", lr, on_epoch=True, on_step=False, sync_dist=True)
-
-    @classmethod
-    def load_from_file_custom(cls, logger_dir: str, checkpoint_name: str, device: str = "cuda"):
-        """Load a GNN model from a checkpoint and args.yaml file.
-
-        Args:
-            logger_dir: Directory containing the checkpoint and args.yaml files
-            checkpoint_name: Name of the checkpoint file
-            device: Device to load the model to ('cpu' or 'cuda')
-
-        Returns:
-            Loaded GNN model
-        """
-        PREDICTOR_MAP = {
-            "AgentGNN": GNNAgentHead,
-            "TemperatureGNN": GNNTemperatureHead,
-            "ReactantAmountGNN": GNNReactantAmountHead,
-            "AgentAmountOneshotGNN": GNNAgentAmountHead,
-            "AgentGNNWithRxnClass": GNNAgentHeadWithRxnClass,
-        }
-        predictor_cls = PREDICTOR_MAP.get(cls.__name__)
-        if predictor_cls is None:
-            raise ValueError(f"Unsupported model class: {cls.__name__}")
-
-        # Load checkpoint and args
-        checkpoint_path = logger_dir + f"/{checkpoint_name}.ckpt"
-        checkpoint = torch.load(checkpoint_path)
-        hparams = checkpoint.get("hyper_parameters", {})
-
-        model_args_path = logger_dir + "/args.yaml"
-        model_args = yaml.load(open(model_args_path, "r"), Loader=yaml.FullLoader)
-        args = TrainArgs().from_dict(model_args)
-
-        fdims = chemprop.featurizers.CondensedGraphOfReactionFeaturizer(mode_="REAC_DIFF").shape
-        message_passing = BondMessagePassing(*fdims, d_h=args.graph_hidden_size, depth=args.depth)
-        predictor = predictor_cls(
-            graph_input_dim=args.graph_hidden_size,
-            agent_input_dim=args.num_classes,
-            output_dim=args.output_size,
-            hidden_dim=args.hidden_size,
-            n_blocks=args.n_blocks,
-        )
-        aggregation = MeanAggregation()
-
-        model = cls(
-            message_passing=message_passing,
-            agg=aggregation,
-            predictor=predictor,
-            batch_norm=True,
-            metrics=hparams.get("metrics", None),
-        )
-        model.load_state_dict(checkpoint["state_dict"])
-        model.to(device)
-        model.eval()
-
-        return model
 
 
 class AgentGNN(BaseGNN):

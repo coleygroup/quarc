@@ -8,7 +8,6 @@ from torch.nn import functional as F
 from torch.optim import Adam
 from torch.optim.lr_scheduler import OneCycleLR, ExponentialLR
 
-from quarc.cli.train_args import TrainArgs
 from quarc.models.modules.ffn_heads import (
     FFNBaseHead,
     FFNAgentAmountHead,
@@ -117,49 +116,6 @@ class BaseFFN(pl.LightningModule):
                 "interval": "step",
             },
         }
-
-    @classmethod
-    def load_from_file_custom(cls, logger_dir: str, checkpoint_name: str, device: str = "cuda"):
-        """Load a FFN model from a checkpoint and args.yaml file."""
-        PREDICTOR_MAP = {
-            "AgentFFN": FFNAgentHead,
-            "TemperatureFFN": FFNTemperatureHead,
-            "ReactantAmountFFN": FFNReactantAmountHead,
-            "AgentAmountFFN": FFNAgentAmountHead,
-            "AgentFFNWithRxnClass": FFNAgentHeadWithRxnClass,
-        }
-        predictor_cls = PREDICTOR_MAP.get(cls.__name__)
-        if predictor_cls is None:
-            raise ValueError(f"Unsupported model class: {cls.__name__}")
-
-        # Load checkpoint and args
-        checkpoint = torch.load(f"{logger_dir}/{checkpoint_name}.ckpt")
-        hparams = checkpoint.get("hyper_parameters", {})
-
-        model_args_path = logger_dir + "/args.yaml"
-        model_args = yaml.load(open(model_args_path, "r"), Loader=yaml.FullLoader)
-        args = TrainArgs().from_dict(model_args)
-
-        # Initialize predictor
-        predictor = predictor_cls(
-            fp_dim=args.FP_length,
-            agent_input_dim=args.num_classes,
-            output_dim=args.output_size,
-            hidden_dim=args.hidden_size,
-            n_blocks=args.n_blocks,
-            activation=args.activation,
-        )
-
-        # Initialize and load model
-        model = cls(
-            predictor=predictor,
-            metrics=hparams.get("metrics", []),
-        )
-        model.load_state_dict(checkpoint["state_dict"])
-        model.to(device)
-        model.eval()
-
-        return model
 
 
 class AgentFFN(BaseFFN):

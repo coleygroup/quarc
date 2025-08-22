@@ -212,7 +212,7 @@ def beam_search(
 
 def beam_search_gnn(
     model: torch.nn.Module,
-    batch_mol_graph: BatchMolGraph,
+    bmg: BatchMolGraph,
     V_d: torch.Tensor,
     x_d: torch.Tensor,
     num_classes: int,
@@ -275,7 +275,7 @@ def beam_search_gnn(
             with torch.no_grad():
                 current_agents = current_agents.to(device)
                 # mask already selected agents with very negative logits
-                logits = model(current_agents, batch_mol_graph, V_d, x_d)
+                logits = model(current_agents, bmg, V_d, x_d)
                 masked_logits = torch.where(current_agents == 1, -1e6, logits)
                 probabilities = torch.softmax(masked_logits, dim=-1)
 

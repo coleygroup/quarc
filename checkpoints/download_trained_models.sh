@@ -5,7 +5,7 @@ mkdir -p checkpoints/temperature
 mkdir -p checkpoints/reactant_amount
 mkdir -p checkpoints/agent_amount
 
-GNN_AGENT_MODEL_URL="https://www.dropbox.com/scl/fi/5hxd7ir4wj0p5nuflxpf3/gnn_agent_model_oss.ckpt?rlkey=m9mfxssehx9xe324fhszzpy4y&st=05pescoj&dl=1"
+GNN_AGENT_MODEL_URL="https://www.dropbox.com/scl/fi/twd3ui9ipnrwgsw57lak4/gnn_agent_model.ckpt?rlkey=rtqjstiq2wuni2o53d6ekn29k&dl=1"
 GNN_TEMPERATURE_MODEL_URL="https://www.dropbox.com/scl/fi/8dpog5knvywpflm5p6w7s/gnn_temperature_model.ckpt?rlkey=bku14kwg9kkjmscm7qdp337f3&dl=1"
 GNN_REACTANT_AMOUNT_MODEL_URL="https://www.dropbox.com/scl/fi/n62w8heoaqof1ed5h99yy/gnn_reactant_amount_model.ckpt?rlkey=wtum2xblvdi88hvz00ppppaf9&dl=1"
 GNN_AGENT_AMOUNT_MODEL_URL="https://www.dropbox.com/scl/fi/6bltnef2gvm9s2m7di8zo/gnn_agent_amount_model.ckpt?rlkey=z36a2jfjzezramktv5x8gy72a&st=mnpedaq1&dl=1"

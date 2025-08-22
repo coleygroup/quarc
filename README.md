@@ -47,8 +47,9 @@ pip install --no-deps -e .
 # 2. Configure NameRxn Code Mapping (REQUIRED)
 export PISTACHIO_NAMERXN_PATH="/path/to/your/Pistachio Reaction Types.csv"
 
-# 3. Optional: Set data paths (uses defaults if not set)
+# 3. Set data paths (or uses defaults in configs/quarc_config.yaml)
 export DATA_ROOT="~/quarc/data"
+export PROCESSED_DATA_ROOT="~/quarc/data/processed"
 ```
 
 _The 2023Q4 version of `Pistachio Reaction Types.csv` is required for compatibility with the pretrained models (requires 2272 classes for reaction class encoding). Using a different version may cause the model to fail._

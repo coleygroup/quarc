@@ -7,6 +7,7 @@ from typing import NamedTuple, Tuple, FrozenSet
 
 from quarc.models.modules.agent_encoder import AgentEncoder
 from quarc.models.modules.agent_standardizer import AgentStandardizer
+from quarc.data.binning import BinningConfig
 from quarc.settings import load as load_settings
 
 cfg = load_settings()
@@ -47,27 +48,10 @@ def get_canonical_condition(
     Converts a reaction datum into a canonical condition representation
     that can be counted for popularity analysis.
     """
-    temperature_bins = np.arange(-100, 201, 10) + 273.15
-    reactant_amount_bins = [
-        0.95,
-        1.05,
-        1.15,
-        1.25,
-        1.35,
-        1.45,
-        1.75,
-        2.25,
-        2.75,
-        3.5,
-        4.5,
-        5.5,
-        6.5,
-        7.5,
-    ]
-    small_bins = np.array([0, 0.075, 0.15, 0.25, 0.55, 0.95])
-    regular_bins = np.array([1.25, 1.75, 2.25, 2.75, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5])
-    large_bins = np.array([15.5, 25.5, 35.5, 45.5, 55.5, 65.5, 75.5, 85.5, 100.5])
-    agent_amount_bins = np.concatenate([small_bins, regular_bins, large_bins])
+    binning_config = BinningConfig.default()
+    temperature_bins = binning_config.temperature_bins
+    reactant_amount_bins = binning_config.reactant_amount_bins
+    agent_amount_bins = binning_config.agent_amount_bins
 
     # Skip reactions with missing data
     if (
@@ -77,16 +61,13 @@ def get_canonical_condition(
     ):
         return None
 
-    # Determine limiting reactant for normalization
     min_reactant_amount = min(r.amount for r in datum.reactants)
 
-    # --- Bin Reactant Ratios ---
     binned_reactant_ratios = [
         np.digitize(r.amount / min_reactant_amount, reactant_amount_bins) for r in datum.reactants
     ]
     canonical_binned_reactant_ratios = tuple(sorted(binned_reactant_ratios))
 
-    # --- Bin Agents and Their Amounts ---
     binned_agents = []
     for agent in datum.agents:
         if agent.smiles is not None:
@@ -97,7 +78,6 @@ def get_canonical_condition(
     binned_agents.sort(key=lambda x: x[0])
     canonical_binned_agents = frozenset(binned_agents)
 
-    # --- Bin Temperature ---
     binned_temp = np.digitize(datum.temperature, temperature_bins)
 
     return CanonicalCondition(

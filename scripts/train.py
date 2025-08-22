@@ -49,12 +49,21 @@ def setup_distributed():
     local_rank = get_local_rank()
     world_size = int(os.environ.get("WORLD_SIZE", 1))
 
-    if world_size > 1 and not torch.distributed.is_initialized():
-        torch.distributed.init_process_group(
-            backend="nccl" if torch.cuda.is_available() else "gloo",
-            world_size=world_size,
-            rank=local_rank,
-        )
+    if torch.cuda.is_available():
+        gpu_count = torch.cuda.device_count()
+        if gpu_count > 1 and world_size == 1 and "MASTER_ADDR" not in os.environ:
+            print("Warning: multiple gpus using distributed training but not using torchrun")
+
+    is_distributed = world_size > 1 or "RANK" in os.environ or "LOCAL_RANK" in os.environ
+    if is_distributed and not torch.distributed.is_initialized():
+        if "MASTER_ADDR" not in os.environ or "MASTER_PORT" not in os.environ:
+            world_size = 1
+        else:
+            torch.distributed.init_process_group(
+                backend="nccl" if torch.cuda.is_available() else "gloo",
+                world_size=world_size,
+                rank=local_rank,
+            )
 
     if torch.cuda.is_available():
         torch.cuda.set_device(local_rank)

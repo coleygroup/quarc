@@ -2,10 +2,6 @@ import os
 import lightning.pytorch as pl
 from torch.utils.data import DataLoader, DistributedSampler
 
-from quarc.models.modules.agent_encoder import AgentEncoder
-from quarc.models.modules.agent_standardizer import AgentStandardizer
-from quarc.models.modules.rxn_encoder import ReactionClassEncoder
-
 from quarc.settings import load as load_settings
 
 cfg = load_settings()
@@ -20,6 +16,11 @@ class ModelFactory:
 
     def _load_encoders(self):
         """Load agent encoder and standardizer"""
+        from quarc.models.modules.agent_encoder import AgentEncoder
+        from quarc.models.modules.agent_standardizer import AgentStandardizer
+        from quarc.models.modules.rxn_encoder import ReactionClassEncoder
+        from quarc.data.binning import BinningConfig
+
         self.agent_encoder = AgentEncoder(
             class_path=cfg.processed_data_dir / "agent_encoder/agent_encoder_list.json"
         )
@@ -30,6 +31,7 @@ class ModelFactory:
         self.rxn_encoder = ReactionClassEncoder(
             class_path=cfg.get("pistachio_namerxn_path")
         )
+        self.binning = BinningConfig.default()
 
     def create_model_and_data(
         self, train_data, val_data
@@ -163,6 +165,7 @@ class ModelFactory:
             agent_encoder=self.agent_encoder,
             fp_radius=self.args.fp_radius,
             fp_length=self.args.fp_length,
+            bins=self.binning.temperature_bins,
         )
         val_dataset = BinnedTemperatureDataset(
             data=val_data,
@@ -170,6 +173,7 @@ class ModelFactory:
             agent_encoder=self.agent_encoder,
             fp_radius=self.args.fp_radius,
             fp_length=self.args.fp_length,
+            bins=self.binning.temperature_bins,
         )
 
         # Data loaders
@@ -207,6 +211,9 @@ class ModelFactory:
             )
 
         # Model
+        if self.args.output_size != len(self.binning.temperature_bins) + 1:
+            raise ValueError(f"output_size {self.args.output_size} does not match binning. Expected to be {len(self.binning.temperature_bins) +1}.")
+
         predictor = FFNTemperatureHead(
             fp_dim=self.args.fp_length,
             agent_input_dim=len(self.agent_encoder),
@@ -255,6 +262,7 @@ class ModelFactory:
             agent_encoder=self.agent_encoder,
             fp_radius=self.args.fp_radius,
             fp_length=self.args.fp_length,
+            bins=self.binning.reactant_amount_bins,
         )
         val_dataset = BinnedReactantAmountDataset(
             data=val_data,
@@ -262,6 +270,7 @@ class ModelFactory:
             agent_encoder=self.agent_encoder,
             fp_radius=self.args.fp_radius,
             fp_length=self.args.fp_length,
+            bins=self.binning.reactant_amount_bins,
         )
 
         # Data loaders
@@ -299,6 +308,9 @@ class ModelFactory:
             )
 
         # Model
+        if self.args.output_size != len(self.binning.reactant_amount_bins) + 1:
+            raise ValueError(f"output_size {self.args.output_size} does not match binning. Expected to be {len(self.binning.reactant_amount_bins) +1}.")
+
         predictor = FFNReactantAmountHead(
             fp_dim=self.args.fp_length,
             agent_input_dim=len(self.agent_encoder),
@@ -347,6 +359,7 @@ class ModelFactory:
             agent_encoder=self.agent_encoder,
             fp_radius=self.args.fp_radius,
             fp_length=self.args.fp_length,
+            bins=self.binning.agent_amount_bins,
         )
         val_dataset = BinnedAgentAmoutOneshot(
             data=val_data,
@@ -354,6 +367,7 @@ class ModelFactory:
             agent_encoder=self.agent_encoder,
             fp_radius=self.args.fp_radius,
             fp_length=self.args.fp_length,
+            bins=self.binning.agent_amount_bins,
         )
 
         # Data loaders
@@ -391,6 +405,9 @@ class ModelFactory:
             )
 
         # Model
+        if self.args.output_size != len(self.binning.agent_amount_bins) + 1:
+            raise ValueError(f"output_size {self.args.output_size} does not match binning. Expected to be {len(self.binning.agent_amount_bins) +1}.")
+
         predictor = FFNAgentAmountHead(
             fp_dim=self.args.fp_length,
             agent_input_dim=len(self.agent_encoder),
@@ -449,26 +466,24 @@ class ModelFactory:
         from quarc.models.modules.gnn_heads import GNNAgentHeadWithRxnClass
         from quarc.models.callbacks import GNNGreedySearchCallback
         from quarc.data.gnn_dataloader import build_dataloader_agent
-        from quarc.models.modules.rxn_encoder import ReactionClassEncoder
         from torcheval.metrics.functional import multilabel_accuracy
 
         # Featurizer and reaction encoder
         featurizer = featurizers.CondensedGraphOfReactionFeaturizer(mode_="REAC_DIFF")
-        rxn_enc = ReactionClassEncoder()
 
         # Datasets
         train_dataset = GNNAugmentedAgentsDatasetWithRxnClass(
             original_data=train_data,
             agent_standardizer=self.agent_standardizer,
             agent_encoder=self.agent_encoder,
-            rxn_encoder=rxn_enc,
+            rxn_encoder=self.rxn_encoder,
             featurizer=featurizer,
         )
         val_dataset = GNNAgentsDatasetWithRxnClass(
             data=val_data,
             agent_standardizer=self.agent_standardizer,
             agent_encoder=self.agent_encoder,
-            rxn_encoder=rxn_enc,
+            rxn_encoder=self.rxn_encoder,
             featurizer=featurizer,
         )
 
@@ -551,12 +566,14 @@ class ModelFactory:
             agent_standardizer=self.agent_standardizer,
             agent_encoder=self.agent_encoder,
             featurizer=featurizer,
+            bins=self.binning.temperature_bins,
         )
         val_dataset = GNNBinnedTemperatureDataset(
             data=val_data,
             agent_standardizer=self.agent_standardizer,
             agent_encoder=self.agent_encoder,
             featurizer=featurizer,
+            bins=self.binning.temperature_bins,
         )
 
         # Data loaders
@@ -612,6 +629,8 @@ class ModelFactory:
                 ignore_index=0,
             ),
         }
+        if self.args.output_size != len(self.binning.temperature_bins) + 1:
+            raise ValueError(f"output_size {self.args.output_size} does not match binning. Expected to be {len(self.binning.temperature_bins) +1}.")
 
         model = TemperatureGNN(
             message_passing=mp,
@@ -646,12 +665,14 @@ class ModelFactory:
             agent_standardizer=self.agent_standardizer,
             agent_encoder=self.agent_encoder,
             featurizer=featurizer,
+            bins=self.binning.reactant_amount_bins,
         )
         val_dataset = GNNBinnedReactantAmountDataset(
             data=val_data,
             agent_standardizer=self.agent_standardizer,
             agent_encoder=self.agent_encoder,
             featurizer=featurizer,
+            bins=self.binning.reactant_amount_bins,
         )
 
         # Data loaders
@@ -708,6 +729,9 @@ class ModelFactory:
             ),
         }
 
+        if self.args.output_size != len(self.binning.reactant_amount_bins) + 1:
+            raise ValueError(f"output_size {self.args.output_size} does not match binning. Expected to be {len(self.binning.reactant_amount_bins) +1}.")
+
         model = ReactantAmountGNN(
             message_passing=mp,
             agg=agg,
@@ -741,15 +765,16 @@ class ModelFactory:
             agent_standardizer=self.agent_standardizer,
             agent_encoder=self.agent_encoder,
             featurizer=featurizer,
+            bins=self.binning.agent_amount_bins,
         )
         val_dataset = GNNBinnedAgentAmountOneShotDataset(
             data=val_data,
             agent_standardizer=self.agent_standardizer,
             agent_encoder=self.agent_encoder,
             featurizer=featurizer,
+            bins=self.binning.agent_amount_bins,
         )
 
-        # Data loaders
         from quarc.data.gnn_dataloader import build_dataloader_agent
 
         train_loader = build_dataloader_agent(
@@ -787,6 +812,9 @@ class ModelFactory:
             hidden_dim=self.args.hidden_size,
             n_blocks=self.args.n_blocks,
         )
+
+        if self.args.output_size != len(self.binning.agent_amount_bins) + 1:
+            raise ValueError(f"output_size {self.args.output_size} does not match binning. Expected to be {len(self.binning.agent_amount_bins) +1}.")
 
         metrics = {
             "accuracy": Accuracy(

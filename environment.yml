@@ -245,6 +245,7 @@ dependencies:
       - torch==2.1.0
       - torcheval==0.0.7
       - torchmetrics==1.7.4
+      - tensorboard==2.18.0
       - tqdm==4.67.1
       - triton==2.1.0
       - typed-argument-parser==1.10.1

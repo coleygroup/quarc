@@ -156,10 +156,8 @@ def run_initial_filters(config):
     max_reactant_atoms = atom_params.get("max_reactant_atoms", 50)
     max_product_atoms = atom_params.get("max_product_atoms", 50)
 
-    conv_rules_path = os.path.join(os.path.dirname(__file__), "../utils/agent_rules_v1.json")
-
     agent_standardizer = AgentStandardizer(
-        conv_rules=conv_rules_path,
+        conv_rules=config["generate_agent_class"]["conv_rules_path"],
         other_dict=config["generate_agent_class"]["output_other_dict_path"],
     )
     agent_encoder = AgentEncoder(class_path=config["generate_agent_class"]["output_encoder_path"])

@@ -1,0 +1,150 @@
+name	density	smiles	can_smiles	source
+butadiene	615	C=CC=C	C=CC=C	https://pubchem.ncbi.nlm.nih.gov/compound/7845#section=Density&fullscreen=true
+pentane	626	CCCCC	CCCCC	https://pubchem.ncbi.nlm.nih.gov/compound/8003#section=Density&fullscreen=true
+hexane	661	CCCCCC	CCCCCC	https://pubchem.ncbi.nlm.nih.gov/compound/8058#section=Density&fullscreen=true
+methane	657	C	C	https://www.engineeringtoolbox.com/methane-d_1420.html
+nBuLi	680	CCCC[Li]	[Li]CCCC	https://www.chemicalbook.com/ChemicalProductProperty_EN_CB9702303.htm
+isoprene	681	C=CC(=C)C	C=CC(=C)C	https://pubchem.ncbi.nlm.nih.gov/compound/6557#section=Density&fullscreen=true
+heptane	680	CCCCCCC	CCCCCCC	https://pubchem.ncbi.nlm.nih.gov/compound/8900#section=Density&fullscreen=true
+ethylamine	689	CCN	CCN	https://pubchem.ncbi.nlm.nih.gov/compound/6341#section=Density&fullscreen=true
+octane	699	CCCCCCCC	CCCCCCCC	https://pubchem.ncbi.nlm.nih.gov/compound/356#section=Density&fullscreen=true
+diethylamine	706	CCNCC	CCNCC	https://pubchem.ncbi.nlm.nih.gov/compound/8021#section=Density&fullscreen=true
+diethyl ether	714	C(C)OCC	CCOCC	https://pubchem.ncbi.nlm.nih.gov/compound/3283#section=Density&fullscreen=true
+propylamine	718	CCCN	CCCN	https://pubchem.ncbi.nlm.nih.gov/compound/7852#section=Density&fullscreen=true
+triethylamine	728	C(C)N(CC)CC	CCN(CC)CC	https://pubchem.ncbi.nlm.nih.gov/compound/8471#section=Density&fullscreen=true
+decane	726	CCCCCCCCCC	CCCCCCCCCC	https://pubchem.ncbi.nlm.nih.gov/compound/15600#section=Density&fullscreen=true
+methyl tert-butyl ether	735	COC(C)(C)C	COC(C)(C)C	https://pubchem.ncbi.nlm.nih.gov/compound/15413#section=Density&fullscreen=true
+DIPEA	742	CCN(C(C)C)C(C)C	CCN(C(C)C)C(C)C	https://www.chemicalbook.com/ChemicalProductProperty_EN_CB4854144.htm
+cyclopentane	746	C1CCCC1	C1CCCC1	https://pubchem.ncbi.nlm.nih.gov/compound/9253#section=Density&fullscreen=true
+cyclohexane	779	C1CCCCC1	C1CCCCC1	https://pubchem.ncbi.nlm.nih.gov/compound/8078#section=Density&fullscreen=true
+acetone	785	CC(=O)C	CC(C)=O	https://pubchem.ncbi.nlm.nih.gov/compound/180#section=Density&fullscreen=true
+acetonitrile	787	C(C)#N	CC#N	https://pubchem.ncbi.nlm.nih.gov/compound/6342#section=Density&fullscreen=true
+2-propanol	786	C(O)C	CCO	https://pubchem.ncbi.nlm.nih.gov/compound/3776#section=Density&fullscreen=true
+acetaldehyde	783	CC=O	CC=O	https://pubchem.ncbi.nlm.nih.gov/compound/177#section=Density&fullscreen=true
+ethanol	789	C(C)O	CCO	https://pubchem.ncbi.nlm.nih.gov/compound/702#section=Density&fullscreen=true
+tert-butanol	789	CC(C)(C)O	CC(C)(C)O	https://pubchem.ncbi.nlm.nih.gov/compound/6386#section=Density&fullscreen=true
+methanol	792	CO	CO	https://pubchem.ncbi.nlm.nih.gov/compound/887#section=Density&fullscreen=true
+borane dimethylsulfide	801	[BH3-][S+](C)C	[BH3-][S+](C)C	https://www.sigmaaldrich.com/US/en/product/aldrich/179825?srsltid=AfmBOoonxTsw9xw1DvsrT06tOlc_cklCNkqPR_GC-9Ubn5dHwiVzl91b
+borane dimethylsulfide	801	B.CSC	B.CSC	https://www.sigmaaldrich.com/US/en/product/aldrich/179825?srsltid=AfmBOoonxTsw9xw1DvsrT06tOlc_cklCNkqPR_GC-9Ubn5dHwiVzl91b
+butanal	802	CCCC=O	CCCC=O	https://pubchem.ncbi.nlm.nih.gov/compound/261#section=Density&fullscreen=true
+isobutanol	802	CC(C)CO	CC(C)CO	https://pubchem.ncbi.nlm.nih.gov/compound/6560#section=Density&fullscreen=true
+1-propanol	803	CCCO	CCCO	https://pubchem.ncbi.nlm.nih.gov/compound/1031#section=Density&fullscreen=true
+2-butanone	806	CC(=O)CC	CCC(C)=O	https://pubchem.ncbi.nlm.nih.gov/compound/6569#section=Density&fullscreen=true
+2-pentanone	809	CC(=O)CCC	CCCC(C)=O	https://pubchem.ncbi.nlm.nih.gov/compound/7895#section=Density&fullscreen=true
+2-butanol	806	CC(O)CC	CCC(C)O	https://pubchem.ncbi.nlm.nih.gov/compound/6568#section=Density&fullscreen=true
+1-butanol	810	CCCCO	CCCCO	https://pubchem.ncbi.nlm.nih.gov/compound/263#section=Density&fullscreen=true
+2-pentanol	812	CC(O)CCC	CCCC(C)O	https://www.sigmaaldrich.com/US/en/product/aldrich/p8017?srsltid=AfmBOoob29w_-OVD-OLHylY00oU1XBLu9h-TBN7qC7Ig38Ykpb4dseh8
+acrylonitrile	801	C=CC#N	C=CC#N	https://pubchem.ncbi.nlm.nih.gov/compound/7855#section=Density&fullscreen=true
+propanal	805	CCC=O	CCC=O	https://pubchem.ncbi.nlm.nih.gov/compound/527#section=Density&fullscreen=true
+cyclohexene	811	C1=CCCCC1	C1=CCCCC1	https://pubchem.ncbi.nlm.nih.gov/compound/8079#section=Density&fullscreen=true
+1-pentanol	815	CCCCCO	CCCCCO	https://pubchem.ncbi.nlm.nih.gov/compound/6276#section=Density&fullscreen=true
+3-pentanone	810	CCC(=O)CC	CCC(=O)CC	https://pubchem.ncbi.nlm.nih.gov/compound/7288#section=Density&fullscreen=true
+1-heptanol	822	CCCCCCCO	CCCCCCCO	https://pubchem.ncbi.nlm.nih.gov/compound/8129#section=Density&fullscreen=true
+3-pentanol	821	CCC(O)CC	CCC(O)CC	https://pubchem.ncbi.nlm.nih.gov/compound/11428#section=Density&fullscreen=true
+1-octanol	826	CCCCCCCCO	CCCCCCCCO	https://pubchem.ncbi.nlm.nih.gov/compound/957#section=Density&fullscreen=true
+1-nonanol	827	CCCCCCCCCO	CCCCCCCCCO	https://pubchem.ncbi.nlm.nih.gov/compound/8914#section=Density&fullscreen=true
+1-decanol	830	CCCCCCCCCCO	CCCCCCCCCCO	https://pubchem.ncbi.nlm.nih.gov/compound/8174#section=Density&fullscreen=true
+m-xylene	870	CC1C=C(C)C=CC=1	Cc1cccc(C)c1	https://pubchem.ncbi.nlm.nih.gov/compound/7929#section=Density&fullscreen=true
+p-xylene	861	CC1=CC=C(C)C=C1	Cc1ccc(C)cc1	https://pubchem.ncbi.nlm.nih.gov/compound/7809#section=Density&fullscreen=true
+cumene	866	CC(C)C1=CC=CC=C1	CC(C)c1ccccc1	https://pubchem.ncbi.nlm.nih.gov/compound/7406#section=Density&fullscreen=true
+ethylbenzene	863	CCC1=CC=CC=C1	CCc1ccccc1	https://pubchem.ncbi.nlm.nih.gov/compound/7500#section=Density&fullscreen=true
+toluene	867	CC1=CC=CC=C1	Cc1ccccc1	https://pubchem.ncbi.nlm.nih.gov/compound/1140#section=Density&fullscreen=true
+"1,2-dimethoxyethane"	868	COCCOC	COCCOC	https://pubchem.ncbi.nlm.nih.gov/compound/8071#section=Density&fullscreen=true
+benzene	876	C1=CC=CC=C1	c1ccccc1	https://pubchem.ncbi.nlm.nih.gov/compound/241#section=Density&fullscreen=true
+benzonitrile	1009	C1=CC=CC=C1C#N	N#Cc1ccccc1	https://pubchem.ncbi.nlm.nih.gov/compound/7505#section=Density&fullscreen=true
+o-xylene	880	CC1=CC=CC=C1C	Cc1ccccc1C	https://pubchem.ncbi.nlm.nih.gov/compound/7237#section=Density&fullscreen=true
+THF	888	C1CCOC1	C1CCOC1	https://pubchem.ncbi.nlm.nih.gov/compound/8028#section=Density&fullscreen=true
+hexamethylphosphorus triamide	898	CN(C)P(N(C)C)N(C)C	CN(C)P(N(C)C)N(C)C	https://www.sigmaaldrich.com/US/en/product/aldrich/393290?srsltid=AfmBOoqp3b1zAOULZoicy8Ax6APQxYcR7W3QSELvpAxvhujwBi_Irm6I
+ethylenediamine	898	NCCN	NCCN	https://pubchem.ncbi.nlm.nih.gov/compound/3301#section=Density&fullscreen=true
+ethyl acetate	902	C(C)(=O)OCC	CCOC(C)=O	https://pubchem.ncbi.nlm.nih.gov/compound/8857#section=Density&fullscreen=true
+styrene	902	C=CC1=CC=CC=C1	C=Cc1ccccc1	https://pubchem.ncbi.nlm.nih.gov/compound/7501#section=Density&fullscreen=true
+ethyl formate	917	CCOC=O	CCOC=O	https://pubchem.ncbi.nlm.nih.gov/compound/8025#section=Density&fullscreen=true
+CF3TMS	962	C[Si](C)(C)C(F)(F)F	C[Si](C)(C)C(F)(F)F	https://www.sigmaaldrich.com/US/en/product/aldrich/488712?srsltid=AfmBOorswBu4Xa4-7WbINv9TOevhuxxBYcIKh7OHdoYTqAMvItqOhDWi
+methyl acetate	934	CC(=O)OC	COC(C)=O	https://pubchem.ncbi.nlm.nih.gov/compound/6584#section=Density&fullscreen=true
+furan	937	O1C=CC=C1	c1ccoc1	https://pubchem.ncbi.nlm.nih.gov/compound/8029#section=Density&fullscreen=true
+diglyme	945	COCCOCCOC	COCCOCCOC	https://pubchem.ncbi.nlm.nih.gov/compound/8150#section=Density&fullscreen=true
+cyclohexanone	945	O=C1CCCCC1	O=C1CCCCC1	https://pubchem.ncbi.nlm.nih.gov/compound/7967#section=Density&fullscreen=true
+DMF	945	CN(C)C=O	CN(C)C=O	https://pubchem.ncbi.nlm.nih.gov/compound/6228#section=Density&fullscreen=true
+diethylenetriamine	954	NCCNCCN	NCCNCCN	https://pubchem.ncbi.nlm.nih.gov/compound/8111#section=Density&fullscreen=true
+cyclohexanol	962	OC1CCCCC1	OC1CCCCC1	https://pubchem.ncbi.nlm.nih.gov/compound/7966#section=Density&fullscreen=true
+pyrrole	967	N1C=CC=C1	c1cc[nH]c1	https://www.sigmaaldrich.com/US/en/product/aldrich/131709?srsltid=AfmBOoqo-ZqIuGvsZvSPfGdwFQPRdBW3sSQGt8ISWVb0PeN15hXpof2B
+diethyl carbonate	975	CCOC(=O)OCC	CCOC(=O)OCC	https://pubchem.ncbi.nlm.nih.gov/compound/7766#section=Density&fullscreen=true
+methyl formate	977	COC=O	COC=O	https://pubchem.ncbi.nlm.nih.gov/compound/7865#section=Density&fullscreen=true
+acetylacetone	975	CC(=O)CC(=O)C	CC(=O)CC(C)=O	https://pubchem.ncbi.nlm.nih.gov/compound/31261#section=Density&fullscreen=true
+pyridine	983	N1=CC=CC=C1	c1ccncc1	https://pubchem.ncbi.nlm.nih.gov/compound/1049#section=Density&fullscreen=true
+anisole	996	COC1=CC=CC=C1	COc1ccccc1	https://pubchem.ncbi.nlm.nih.gov/compound/7519#section=Density&fullscreen=true
+water	997	O	O	https://www.sigmaaldrich.com/US/en/product/sial/denwat?srsltid=AfmBOopZesAdp0rhDqRkiokZsSA50RnRhFEkFxwChPD9Po-GVePxxhbn
+phenethyl alcohol	1020	OCCC1=CC=CC=C1	OCCc1ccccc1	https://pubchem.ncbi.nlm.nih.gov/compound/6054#section=Density&fullscreen=true
+2-aminoethanol	1018	NCCO	NCCO	https://pubchem.ncbi.nlm.nih.gov/compound/700#section=Density&fullscreen=true
+ethyl acetoacetate	1028	CCOC(=O)CC(=O)C	CCOC(=O)CC(C)=O	https://pubchem.ncbi.nlm.nih.gov/compound/8868#section=Density&fullscreen=true
+pyrimidine	1016	N1=CN=CC=C1	c1cncnc1	https://www.sigmaaldrich.com/US/en/product/aldrich/131695?srsltid=AfmBOoryLF2Rbh4kzKEGUd8fC9NbNXDAPYaGeF8HQFxNqmXHWsG8fFlO
+aniline	1022	NC1=CC=CC=C1	Nc1ccccc1	https://pubchem.ncbi.nlm.nih.gov/compound/6115#section=Density&fullscreen=true
+naphthalene	1150	C1=CC=C2C=CC=CC2=C1	c1ccc2ccccc2c1	https://pubchem.ncbi.nlm.nih.gov/compound/931#section=Density&fullscreen=true
+"1,4-dioxane"	1034	O1CCOCC1	C1COCCO1	https://pubchem.ncbi.nlm.nih.gov/compound/31275#section=Density&fullscreen=true
+hexamethylphosphoramide	1024	O=P(N(C)C)(N(C)C)N(C)C	CN(C)P(=O)(N(C)C)N(C)C	https://pubchem.ncbi.nlm.nih.gov/compound/12679#section=Density&fullscreen=true
+N-methyl-2-pyrrolidone	1027	CN1CCCC1=O	CN1CCCC1=O	https://pubchem.ncbi.nlm.nih.gov/compound/13387#section=Density&fullscreen=true
+benzaldehyde	1046	C1=CC=CC=C1C=O	O=Cc1ccccc1	https://pubchem.ncbi.nlm.nih.gov/compound/240#section=Density&fullscreen=true
+benzyl alcohol	1042	C1=CC=CC=C1CO	OCc1ccccc1	https://pubchem.ncbi.nlm.nih.gov/compound/244#section=Density&fullscreen=true
+acetic acid	1045	CC(=O)O	CC(=O)O	https://pubchem.ncbi.nlm.nih.gov/compound/176#section=Density&fullscreen=true
+thiophene	1051	S1C=CC=C1	c1ccsc1	https://www.sigmaaldrich.com/US/en/product/aldrich/t31801
+phenol	1071	OC1=CC=CC=C1	Oc1ccccc1	https://pubchem.ncbi.nlm.nih.gov/compound/996#section=Density&fullscreen=true
+dimethyl carbonate	1064	COC(=O)OC	COC(=O)OC	https://pubchem.ncbi.nlm.nih.gov/compound/12021#section=Density&fullscreen=true
+acetic anhydride	1082	C(C)(=O)OC(C)=O	CC(=O)OC(C)=O	https://pubchem.ncbi.nlm.nih.gov/compound/7918#section=Density&fullscreen=true
+DMSO	1100	CS(=O)C	CS(C)=O	https://pubchem.ncbi.nlm.nih.gov/compound/679#section=Density&fullscreen=true
+2-phenoxyethanol	1109	OCCOC1=CC=CC=C1	OCCOc1ccccc1	https://pubchem.ncbi.nlm.nih.gov/compound/31236#section=Density&fullscreen=true
+acetylene (gas)	377	C#C	C#C	https://pubchem.ncbi.nlm.nih.gov/compound/Acetylene#section=Density&fullscreen=true
+chlorobenzene	1106	ClC1=CC=CC=C1	Clc1ccccc1	https://pubchem.ncbi.nlm.nih.gov/compound/7964#section=Density&fullscreen=true
+heavy water	1107	[2H]O[2H]	[2H]O[2H]	https://www.sigmaaldrich.com/US/en/product/aldrich/756822?srsltid=AfmBOopi_BWZhnDx68-K2e8l53XxtnQUFIhZ5-kFBOIBlP1X-Q4h8vo8
+ethylene glycol	1114	OCCO	OCCO	https://pubchem.ncbi.nlm.nih.gov/compound/174#section=Density&fullscreen=true
+pyridazine	1103	N1=CC=CC=N1	c1ccnnc1	https://www.sigmaaldrich.com/US/en/product/aldrich/p57204
+diethylene glycol	1118	OCCOCCO	OCCOCCO	https://pubchem.ncbi.nlm.nih.gov/compound/8117#section=Density&fullscreen=true
+"1,1-dichloroethane"	1175	CC(Cl)Cl	CC(Cl)Cl	https://pubchem.ncbi.nlm.nih.gov/compound/6365#section=Density&fullscreen=true
+formic acid	1220	O=CO	O=CO	https://pubchem.ncbi.nlm.nih.gov/compound/284#section=Density&fullscreen=true
+methyl chloroformate	1223	O=C(Cl)OC	COC(=O)Cl	https://pubchem.ncbi.nlm.nih.gov/compound/6586#section=Density&fullscreen=true
+imidazole	1233	N1C=CN=C1	c1c[nH]cn1	https://www.sigmaaldrich.com/US/en/product/mm/814223?srsltid=AfmBOoppOwguWjcTfDnKz5fB3F0WX2gkY8LKx03_PbVhAuMZiftQ_GrG
+"1,2-dichloroethane"	1245	ClCCCl	ClCCCl	https://pubchem.ncbi.nlm.nih.gov/compound/11#section=Density&fullscreen=true
+glycerol	1261	OCC(O)CO	OCC(O)CO	https://pubchem.ncbi.nlm.nih.gov/compound/753#section=Density&fullscreen=true
+carbon disulfide	1263	S=C=S	S=C=S	https://pubchem.ncbi.nlm.nih.gov/compound/6348#section=Density&fullscreen=true
+DCM	1326	ClCCl	ClCCl	https://pubchem.ncbi.nlm.nih.gov/compound/6344#section=Density&fullscreen=true
+nitromethane	1137	C[N+](=O)[O-]	C[N+](=O)[O-]	https://pubchem.ncbi.nlm.nih.gov/compound/6375#section=Density&fullscreen=true
+nitromethane	1137	CN(=O)=O	C[N+](=O)[O-]	https://pubchem.ncbi.nlm.nih.gov/compound/6375#section=Density&fullscreen=true
+oxalyl chloride	1500	C(#[O+])C#[O+].[Cl-].[Cl-]	[Cl-].[Cl-].[O+]#CC#[O+]	https://www.sigmaaldrich.com/US/en/product/aldrich/221015?srsltid=AfmBOooQf34rWH6eW5IyOfVYyZd6J9kMXDg8l2U1n0VGs2RcamywOl0Y
+oxalyl chloride	1500	ClC(=O)C(=O)Cl	O=C(Cl)C(=O)Cl	https://www.sigmaaldrich.com/US/en/product/aldrich/221015?srsltid=AfmBOooQf34rWH6eW5IyOfVYyZd6J9kMXDg8l2U1n0VGs2RcamywOl0Y
+chloroform	1479	C(Cl)(Cl)Cl	ClC(Cl)Cl	https://pubchem.ncbi.nlm.nih.gov/compound/6212#section=Density&fullscreen=true
+TFA	1531	C(=O)(C(F)(F)F)O	O=C(O)C(F)(F)F	https://pubchem.ncbi.nlm.nih.gov/compound/6422#section=Density&fullscreen=true
+hydrogen chloride	1180	Cl	Cl	https://www.sigmaaldrich.com/US/en/product/vetec/v800203
+phosphorus trichloride	1574	ClP(Cl)Cl	ClP(Cl)Cl	https://pubchem.ncbi.nlm.nih.gov/compound/24387#section=Density&fullscreen=true
+carbon tetrachloride	1594	ClC(Cl)(Cl)Cl	ClC(Cl)(Cl)Cl	https://pubchem.ncbi.nlm.nih.gov/compound/5943#section=Density&fullscreen=true
+1-iodobutane	1617	ICCCC	CCCCI	https://www.sigmaaldrich.com/US/en/product/aldrich/167304
+sulfur dichloride	1621	ClSCl	ClSCl	https://pubchem.ncbi.nlm.nih.gov/compound/25353#section=Density&fullscreen=true
+thionyl chloride	1640	O=S(Cl)Cl	O=S(Cl)Cl	https://pubchem.ncbi.nlm.nih.gov/compound/24386#section=Density&fullscreen=true
+sulfuryl chloride	1670	ClS(=O)(=O)Cl	O=S(=O)(Cl)Cl	https://pubchem.ncbi.nlm.nih.gov/compound/24648#section=Density&fullscreen=true
+titanium tetrachloride	1726	Cl[Ti](Cl)(Cl)Cl	Cl[Ti](Cl)(Cl)Cl	https://pubchem.ncbi.nlm.nih.gov/compound/24193#section=Density&fullscreen=true
+propene	505	CC=C	C=CC	https://pubchem.ncbi.nlm.nih.gov/compound/Propylene#section=Density&fullscreen=true
+perchloric acid	1768	OCl(=O)(=O)=O	[O-][Cl+3]([O-])([O-])O	https://pubchem.ncbi.nlm.nih.gov/compound/24247#section=Density&fullscreen=true
+sulfuric acid	1830	S(O)(O)(=O)=O	O=S(=O)(O)O	https://pubchem.ncbi.nlm.nih.gov/compound/1118#section=Density&fullscreen=true
+sulfur trioxide	1920	O=S(=O)=O	O=S(=O)=O	https://pubchem.ncbi.nlm.nih.gov/compound/24682#section=Density&fullscreen=true
+sodium hydroxide	2130	[OH-].[Na+]	[Na+].[OH-]	https://pubchem.ncbi.nlm.nih.gov/compound/14798#section=Density&fullscreen=true
+sodium hydroxide	2130	O[Na]	O[Na]	https://pubchem.ncbi.nlm.nih.gov/compound/14798#section=Density&fullscreen=true
+NaHCO3	2200	[Na]OC(=O)O	O=C(O)O[Na]	https://pubchem.ncbi.nlm.nih.gov/compound/516892#section=Density&fullscreen=true
+NaHCO3	2200	C(=O)(O)[O-].[Na+]	O=C([O-])O.[Na+]	https://pubchem.ncbi.nlm.nih.gov/compound/516892#section=Density&fullscreen=true
+boron tribromide	2645	BrB(Br)Br	BrB(Br)Br	https://pubchem.ncbi.nlm.nih.gov/compound/25134#section=Density&fullscreen=true
+bromine	3102	[Br][Br]	BrBr	https://pubchem.ncbi.nlm.nih.gov/compound/24408#section=Density&fullscreen=true
+mercury	13534	[Hg]	[Hg]	https://pubchem.ncbi.nlm.nih.gov/compound/23931#section=Density&fullscreen=true
+hydrazine hydrate	1029	NN.O	NN.O	https://pubchem.ncbi.nlm.nih.gov/compound/24654#section=Density&fullscreen=true
+isoporpyl alcohol	785	CC(C)O	CC(C)O	https://pubchem.ncbi.nlm.nih.gov/compound/3776#section=Density&fullscreen=true
+deuterochloroform	1500	[2H]C(Cl)(Cl)Cl	[2H]C(Cl)(Cl)Cl	https://www.sigmaaldrich.com/US/en/product/aldrich/151823
+tert-Amyl alcohol	810	CCC(C)(C)O	CCC(C)(C)O	https://pubchem.ncbi.nlm.nih.gov/compound/6405#section=Density&fullscreen=true
+2-ethoxyethanol	925	CCOCCO	CCOCCO	https://pubchem.ncbi.nlm.nih.gov/compound/8076#section=Density&fullscreen=true
+propionitrile	782	CCC#N	CCC#N	https://pubchem.ncbi.nlm.nih.gov/compound/Propionitrile#section=Density&fullscreen=true
+mesitylene	864	CC1=CC(=CC(=C1)C)C	Cc1cc(C)cc(C)c1	https://pubchem.ncbi.nlm.nih.gov/compound/7947#section=Density&fullscreen=true
+Isohexane	655	CCCC(C)C	CCCC(C)C	https://pubchem.ncbi.nlm.nih.gov/compound/7892#section=Density&fullscreen=true
+trifluoromethylbenzene	1181	C1=CC=C(C=C1)C(F)(F)F	FC(F)(F)c1ccccc1	https://pubchem.ncbi.nlm.nih.gov/compound/7368#section=Density&fullscreen=true
+Dowtherm	1181	C1=CC=C(C=C1)C2=CC=CC=C2.C1=CC=C(C=C1)OC2=CC=CC=C2	c1ccc(-c2ccccc2)cc1.c1ccc(Oc2ccccc2)cc1	https://pubchem.ncbi.nlm.nih.gov/compound/24670#section=Density&fullscreen=true
+butyronitrile	794	CCCC#N	CCCC#N	https://pubchem.ncbi.nlm.nih.gov/compound/n-butyronitrile#section=Density&fullscreen=true
+tert-butyl acetate	867	CC(=O)OC(C)(C)C	CC(=O)OC(C)(C)C	https://pubchem.ncbi.nlm.nih.gov/compound/10908#section=Density&fullscreen=true
+propylene glycol	1036	CC(O)CO	CC(O)CO	https://pubchem.ncbi.nlm.nih.gov/compound/1030#section=Density&fullscreen=true
+"1,1,2,2-tetrachloroethane"	1595	ClC(Cl)C(Cl)Cl	ClC(Cl)C(Cl)Cl	https://pubchem.ncbi.nlm.nih.gov/compound/6591#section=Density&fullscreen=true
+"1,4-dichlorobenzene"	1248	C1=CC(=CC=C1Cl)Cl	Clc1ccc(Cl)cc1	https://pubchem.ncbi.nlm.nih.gov/compound/4685#section=Density&fullscreen=true
+triethylene glycol	1125	C(COCCOCCO)O	OCCOCCOCCO	https://pubchem.ncbi.nlm.nih.gov/compound/8172#section=Density&fullscreen=true
+p-cymene	857	CC1=CC=C(C=C1)C(C)C	Cc1ccc(C(C)C)cc1	https://pubchem.ncbi.nlm.nih.gov/compound/7463#section=Density&fullscreen=true

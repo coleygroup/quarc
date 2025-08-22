@@ -9,5 +9,5 @@ logs_root: "~/quarc/logs"
 pistachio_namerxn_path: null # Required for training and inference
 
 # Needed for preprocessing
-raw_data_path: "~/quarc/data/raw"
-pistachio_density_path: null # Required for preprocessing
+raw_data_path: null # path/to/pistachio/extract/
+pistachio_density_path: null # replace with pistachio's density file or use our curated open source version`

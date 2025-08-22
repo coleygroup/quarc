@@ -147,7 +147,7 @@ pip install --no-deps -e .
 
 Configure paths using one of the following options:
 
-- **Option 1**: Environment Variables
+- **Option 1**: Environment Variables (Recommended)
 
   Variables can be set directly in terminal or in a `.env` file.
 
@@ -169,6 +169,8 @@ Configure paths using one of the following options:
 - **Option 2**: Edit Configuration Files
   Edit `configs/quarc_config.yaml` to modify default paths.
 
+The default values in `src/quarc/settings.py` are overridden by `configs/quarc_config.yaml` if present, then further overridden by environment variables, with each step taking precedence over the previous.
+
 ### Step 2/5: Data Preprocessing
 
 The preprocessing pipeline transforms raw Pistachio data into `ReactionDatum` objects that are used for training. You can configure the preprocessing pipeline in `configs/preprocess_config.yaml`. The `dirs` section contains placeholders paths that will be overridden by the environment variables. Details of the preprocessing pipeline are described [here](src/quarc/preprocessing/documentation.md).
@@ -187,6 +189,8 @@ python scripts/preprocess.py \
     ...
 ```
 
+Note that running the `--generate-agent-class` step will overwrite the `agent_encoder_list.json` and `agent_other_dict.json` that we provide in the `data/processed/` directory. If you want to use the provided `agent_encoder_list.json` and `agent_other_dict.json`, you can skip the `--generate-agent-class` step.
+
 ### Step 3/5: Training
 
 Run training for each stage:
@@ -204,10 +208,14 @@ python scripts/train.py \
     --batch-size 512 \
     --max-lr 1e-3 \
     --logger-name stage1_gnn
+    --output-size 1376 \
+    --num-classes 1376 \
     ...
 ```
 
 For stage 1 agent prediction, the tensorboard logger only keeps track of the greedy search accuracy. You may want to perform offline [beam search](src/quarc/models/search.py#L96) evaluation to select the best checkpoint.
+
+
 
 ### Step 4/5: Create Pipeline Config
 

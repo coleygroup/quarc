@@ -52,9 +52,8 @@ def generate_agent_class(config):
 
     agent_distribution = count_agent_distribution(config)
 
-    conv_rules_path = os.path.join(os.path.dirname(__file__), "../utils/agent_rules_v1.json")
     # load conv_rules
-    with open(conv_rules_path, "r") as f:
+    with open(config["generate_agent_class"]["conv_rules_path"], "r") as f:
         conv_rules = json.load(f)
 
     # apply conv_rules

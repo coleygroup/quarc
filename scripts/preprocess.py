@@ -61,27 +61,34 @@ from quarc.settings import load as load_settings
 cfg = load_settings()
 
 
+def replace_placeholders(obj, replacements):
+    """Recursively replace placeholders in nested dictionaries and lists"""
+    if isinstance(obj, dict):
+        return {key: replace_placeholders(value, replacements) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [replace_placeholders(item, replacements) for item in obj]
+    elif isinstance(obj, str):
+        for template, replacement in replacements.items():
+            obj = obj.replace(template, replacement)
+        return obj
+    else:
+        return obj
+
+
 def load_config(config_path) -> dict:
     """Loads preprocessing config and replace paths"""
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 
-    # replace placeholders with environment variables
-    if "dirs" in config:
-        dirs = config["dirs"]
-        replacements = {
-            "{raw_dir}": os.getenv("RAW_DIR", cfg.get("raw_data_path")),
-            "{data_interim}": str(cfg.data_dir / "interim"),
-            "{data_processed}": str(cfg.processed_data_dir),
-            "{data_root}": str(cfg.data_dir),
-            "{checkpoints}": str(cfg.checkpoints_dir),
-        }
-        for key, path in dirs.items():
-            if isinstance(path, str):
-                for template, replacement in replacements.items():
-                    path = path.replace(template, replacement)
-                dirs[key] = path
+    replacements = {
+        "{raw_dir}": os.getenv("RAW_DIR", cfg.get("raw_data_path")),
+        "{data_interim}": str(cfg.data_dir / "interim"),
+        "{data_processed}": str(cfg.processed_data_dir),
+        "{data_root}": str(cfg.data_dir),
+        "{checkpoints}": str(cfg.checkpoints_dir),
+    }
 
+    config = replace_placeholders(config, replacements)
     return config
 
 

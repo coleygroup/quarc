@@ -2,6 +2,7 @@ import os
 import lightning.pytorch as pl
 from torch.utils.data import DataLoader, DistributedSampler
 
+from quarc.data.binning import BinningConfig
 from quarc.settings import load as load_settings
 
 cfg = load_settings()
@@ -14,12 +15,16 @@ class ModelFactory:
         self._load_encoders()
         self.world_size = int(os.environ.get("WORLD_SIZE", 1))
 
+        if self.args.binning_path:
+            self.binning = BinningConfig.from_config(self.args.binning_path)
+        else:
+            self.binning = BinningConfig.default()
+
     def _load_encoders(self):
         """Load agent encoder and standardizer"""
         from quarc.models.modules.agent_encoder import AgentEncoder
         from quarc.models.modules.agent_standardizer import AgentStandardizer
         from quarc.models.modules.rxn_encoder import ReactionClassEncoder
-        from quarc.data.binning import BinningConfig
 
         self.agent_encoder = AgentEncoder(
             class_path=cfg.processed_data_dir / "agent_encoder/agent_encoder_list.json"
@@ -31,7 +36,6 @@ class ModelFactory:
         self.rxn_encoder = ReactionClassEncoder(
             class_path=cfg.get("pistachio_namerxn_path")
         )
-        self.binning = BinningConfig.default()
 
     def create_model_and_data(
         self, train_data, val_data

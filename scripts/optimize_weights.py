@@ -12,12 +12,12 @@ from quarc.models.modules.agent_encoder import AgentEncoder
 from quarc.models.modules.agent_standardizer import AgentStandardizer
 from quarc.models.modules.rxn_encoder import ReactionClassEncoder
 from quarc.data.eval_datasets import EvaluationDatasetFactory, UnifiedEvaluationDataset
+from quarc.data.binning import BinningConfig
 from quarc.predictors.model_factory import load_models_from_yaml
 from quarc.predictors.base import PredictionList
 from quarc.predictors.multistage_predictor import EnumeratedPredictor
 from quarc.settings import load as load_settings
 from quarc.cli.quarc_parser import add_opt_opts
-
 from analysis.correctness import check_overall_prediction
 
 cfg = load_settings()
@@ -112,6 +112,7 @@ def optimize_weights(
         agent_encoder=agent_encoder,
         rxn_encoder=rxn_encoder,
         featurizer=featurizer,
+        binning_config=BinningConfig.default(),
     )
 
     # load models only (weights will be optimized)

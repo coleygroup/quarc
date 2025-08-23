@@ -1,5 +1,10 @@
 from dataclasses import dataclass
 import numpy as np
+import yaml
+
+from quarc.settings import load as load_settings
+
+cfg = load_settings()
 
 
 @dataclass
@@ -18,10 +23,30 @@ class BinningConfig:
             [0.95, 1.05, 1.15, 1.25, 1.35, 1.45, 1.75, 2.25, 2.75, 3.5, 4.5, 5.5, 6.5, 7.5]
         )
 
-        small_bins = np.array([0, 0.075, 0.15, 0.25, 0.55, 0.95])
-        regular_bins = np.array([1.25, 1.75, 2.25, 2.75, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5])
-        large_bins = np.array([15.5, 25.5, 35.5, 45.5, 55.5, 65.5, 75.5, 85.5, 100.5])
-        agent_amount_bins = np.concatenate([small_bins, regular_bins, large_bins])
+        substoichiometric = np.array([0, 0.075, 0.15, 0.25, 0.55, 0.95])
+        stoichiometric = np.array([1.25, 1.75, 2.25, 2.75, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5])
+        superstoichiometric = np.array([15.5, 25.5, 35.5, 45.5, 55.5, 65.5, 75.5, 85.5, 100.5])
+        agent_amount_bins = np.concatenate(
+            [substoichiometric, stoichiometric, superstoichiometric]
+        )
+
+        return cls(temperature_bins, reactant_amount_bins, agent_amount_bins)
+
+    @classmethod
+    def from_config(cls, config_path: str):
+        with open(config_path, "r") as f:
+            config = yaml.safe_load(f)
+        binning_config = config["binning"]
+
+        temperature_bins = np.array(binning_config["temperature"]["bins"])
+        reactant_amount_bins = np.array(binning_config["reactant_amount"]["bins"])
+        agent_amount_bins = np.concatenate(
+            [
+                binning_config["agent_amount"]["substoichiometric"],
+                binning_config["agent_amount"]["stoichiometric"],
+                binning_config["agent_amount"]["superstoichiometric"],
+            ]
+        )
 
         return cls(temperature_bins, reactant_amount_bins, agent_amount_bins)
 

@@ -106,17 +106,6 @@ class UnifiedEvaluationDataset:
             ReactionInput: A dataclass containing the metadata, model inputs, and targets.
         """
 
-        # try:
-        #     targets = self._get_targets(self.data[idx]) if self.include_targets else {}
-        # except TypeError as e:
-        #     print(f"Error getting targets{e}")
-        #     targets = {
-        #         "target_agents": np.array([0]),
-        #         "target_temp": 0,
-        #         "target_reactant_amounts": np.array([0]),
-        #         "target_agent_amounts": [(0, 0)],
-        #     }
-
         return ReactionInput(
             metadata=self._get_metadata(self.data[idx]),
             model_inputs=(
@@ -266,9 +255,11 @@ class EvaluationDatasetFactory:
         agent_encoder: AgentEncoder,
         featurizer: CondensedGraphOfReactionFeaturizer,
         rxn_encoder: ReactionClassEncoder,
+        binning_config: BinningConfig = None,
         **kwargs,
     ) -> UnifiedEvaluationDataset:
         """Create dataset for model (with model inputs)."""
+
         return UnifiedEvaluationDataset(
             data=data,
             agent_standardizer=agent_standardizer,
@@ -277,6 +268,7 @@ class EvaluationDatasetFactory:
             rxn_encoder=rxn_encoder,
             include_raw_data=False,
             include_model_inputs=True,
+            binning_config=binning_config or BinningConfig.default(),
             **kwargs,
         )
 
@@ -287,9 +279,11 @@ class EvaluationDatasetFactory:
         agent_encoder: AgentEncoder,
         featurizer: CondensedGraphOfReactionFeaturizer,
         rxn_encoder: ReactionClassEncoder,
+        binning_config: BinningConfig = None,
         **kwargs,
     ) -> UnifiedEvaluationDataset:
         """Create dataset without model inputs but has targets."""
+
         return UnifiedEvaluationDataset(
             data=data,
             agent_standardizer=agent_standardizer,
@@ -298,6 +292,7 @@ class EvaluationDatasetFactory:
             rxn_encoder=rxn_encoder,
             include_raw_data=False,
             include_model_inputs=False,
+            binning_config=binning_config or BinningConfig.default(),
             **kwargs,
         )
 
@@ -325,9 +320,11 @@ class EvaluationDatasetFactory:
         agent_encoder: AgentEncoder,
         featurizer: CondensedGraphOfReactionFeaturizer,
         rxn_encoder: ReactionClassEncoder,
+        binning_config: BinningConfig = None,
         **kwargs,
     ) -> UnifiedEvaluationDataset:
         """Create dataset for model (with model inputs)."""
+
         return UnifiedEvaluationDataset(
             data=data,
             agent_standardizer=agent_standardizer,
@@ -337,5 +334,6 @@ class EvaluationDatasetFactory:
             include_raw_data=True,
             include_model_inputs=True,
             include_targets=False,
+            binning_config=binning_config or BinningConfig.default(),
             **kwargs,
         )

@@ -11,7 +11,6 @@ from torch import Tensor
 from torch.utils.data import Dataset, IterableDataset
 
 from quarc.data.datapoints import AgentRecord, ReactionDatum
-from quarc.data.binning import BinningConfig
 from quarc.models.modules.agent_encoder import AgentEncoder
 from quarc.models.modules.agent_standardizer import AgentStandardizer
 from quarc.models.modules.rxn_encoder import ReactionClassEncoder
@@ -436,9 +435,9 @@ class BinnedTemperatureDataset(ReactionDatasetBase):
         data: list[ReactionDatum],
         agent_standardizer: AgentStandardizer,
         agent_encoder: AgentEncoder,
+        bins: list[float],
         fp_radius: int = 3,
         fp_length: int = 2048,
-        bins: None | list[float] = None,
     ):
         """Initialize the BinnedTemperatureDataset.
 
@@ -452,10 +451,7 @@ class BinnedTemperatureDataset(ReactionDatasetBase):
         """
 
         super().__init__(data, agent_standardizer, agent_encoder, fp_radius, fp_length)
-        if bins is None:
-            self.bins = np.arange(-100, 201, 10) + 273.15
-        else:
-            self.bins = bins
+        self.bins = bins
 
     @property
     def bin_labels(self):
@@ -502,9 +498,9 @@ class BinnedReactantAmountDataset(ReactionDatasetBase):
         data: list[ReactionDatum],
         agent_standardizer: AgentStandardizer,
         agent_encoder: AgentEncoder,
+        bins: list[float],
         fp_radius: int = 3,
         fp_length: int = 2048,
-        bins: None | list[float] = None,
     ):
         """Initialize the BinnedReactantAmountDataset.
 
@@ -518,25 +514,8 @@ class BinnedReactantAmountDataset(ReactionDatasetBase):
         """
 
         super().__init__(data, agent_standardizer, agent_encoder, fp_radius, fp_length)
-        if bins is None:
-            self.bins = [
-                0.95,
-                1.05,
-                1.15,
-                1.25,
-                1.35,
-                1.45,
-                1.75,
-                2.25,
-                2.75,
-                3.5,
-                4.5,
-                5.5,
-                6.5,
-                7.5,
-            ]
-        else:
-            self.bins = bins
+
+        self.bins = bins
 
     @property
     def bin_labels(self):
@@ -607,9 +586,9 @@ class BinnedAgentAmoutOneshot(ReactionDatasetBase):
         data: list[ReactionDatum],
         agent_standardizer: AgentStandardizer,
         agent_encoder: AgentEncoder,
+        bins: list[float],
         fp_radius: int = 3,
         fp_length: int = 2048,
-        bins: None | list[float] = None,
     ):
         """Initialize the BinnedAgentAmoutOneshot.
 
@@ -617,19 +596,13 @@ class BinnedAgentAmoutOneshot(ReactionDatasetBase):
             data: list of ReactionDatum
             agent_standardizer: AgentStandardizer
             agent_encoder: AgentEncoder
+            bins: agent amount bin edges
             fp_radius: default 3
             fp_length: default 2048
-            bins: agent amount bin edges
         """
 
         super().__init__(data, agent_standardizer, agent_encoder, fp_radius, fp_length)
-        if bins is None:
-            small_bins = np.array([0, 0.075, 0.15, 0.25, 0.55, 0.95])
-            regular_bins = np.array([1.25, 1.75, 2.25, 2.75, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5])
-            large_bins = np.array([15.5, 25.5, 35.5, 45.5, 55.5, 65.5, 75.5, 85.5, 100.5])
-            self.bins = np.concatenate([small_bins, regular_bins, large_bins])
-        else:
-            self.bins = bins
+        self.bins = bins
 
     @property
     def bin_labels(self):

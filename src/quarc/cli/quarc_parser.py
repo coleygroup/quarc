@@ -87,6 +87,7 @@ def add_train_opts(parser):
     group.add_argument("--gpu", type=int, default=0, help="specific GPU device to use")
     group.add_argument("--num-workers", type=int, default=8, help="number of data loading workers")
     group.add_argument("--checkpoint-path", type=str, default="", help="resume from checkpoint")
+    group.add_argument("--binning-path", type=str, default=None, help="binning config path")
 
     # hyperparameters
     group.add_argument("--max-epochs", type=int, default=30, help="maximum number of epochs")

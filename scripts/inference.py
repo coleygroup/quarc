@@ -97,7 +97,7 @@ def load_encoders(cfg):
     )
     rxn_encoder = ReactionClassEncoder(class_path=cfg.pistachio_namerxn_path)
     featurizer = CondensedGraphOfReactionFeaturizer(mode_="REAC_DIFF")
-    return agent_encoder, agent_standardizer, rxn_encoder, featurizer
+    return agent_encoder, agent_standardizer, rxn_encoder, featurizer, binning_config
 
 
 def load_data(input_path: str) -> list[ReactionDatum]:
@@ -149,6 +149,7 @@ def run_inference(input_path: str, output_path: str, config_path: str, top_k: in
         agent_encoder=agent_encoder,
         rxn_encoder=rxn_encoder,
         featurizer=featurizer,
+        binning_config=BinningConfig.default(),
     )
 
     # run inference

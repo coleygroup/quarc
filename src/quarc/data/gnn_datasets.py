@@ -406,18 +406,16 @@ class GNNBinnedTemperatureDataset(Dataset):
         agent_standardizer: AgentStandardizer,
         agent_encoder: AgentEncoder,
         featurizer: CondensedGraphOfReactionFeaturizer,
-        bins: None | list[float] = None,
+        bins: list[float],
         **kwargs,
     ):
         self.agent_standardizer = agent_standardizer
         self.agent_encoder = agent_encoder
         self.featurizer = featurizer
 
-        if bins is None:
-            bins = np.arange(-100, 201, 10) + 273.15
         self.bins = bins
-
         self.data = data
+
         super().__init__()
 
     @property
@@ -513,8 +511,7 @@ class GNNBinnedReactantAmountDataset(Dataset):
         agent_standardizer: AgentStandardizer,
         agent_encoder: AgentEncoder,
         featurizer: CondensedGraphOfReactionFeaturizer,
-        # morgan_generator: rdFingerprintGenerator,
-        bins: None | list[float] = None,
+        bins: list[float],
         fp_radius: int = 3,
         fp_length: int = 2048,
         **kwargs,
@@ -522,10 +519,7 @@ class GNNBinnedReactantAmountDataset(Dataset):
         self.agent_standardizer = agent_standardizer
         self.agent_encoder = agent_encoder
         self.featurizer = featurizer
-        # self.morgan_generator = morgan_generator
 
-        if bins is None:
-            bins = [0.95, 1.05, 1.15, 1.25, 1.35, 1.45, 1.75, 2.25, 2.75, 3.5, 4.5, 5.5, 6.5, 7.5]
         self.bins = bins
         self.fp_radius = fp_radius
         self.fp_length = fp_length
@@ -534,22 +528,12 @@ class GNNBinnedReactantAmountDataset(Dataset):
         super().__init__()
 
     def generate_fingerprint(self, agent_records: list[AgentRecord]) -> np.ndarray:
-        # features_combined = np.zeros((2048,), dtype=bool)
-        # for agent_record in agent_records:
-        #     mol = Chem.MolFromSmiles(agent_record.smiles)
-        #     if mol is not None and mol.GetNumHeavyAtoms() > 0:
-        #         fp = self.morgan_generator.GetFingerprint(mol)
-        #         arr = np.zeros((2048,), dtype=bool)
-        #         DataStructs.ConvertToNumpyArray(fp, arr)
-        #         features_combined |= arr
-        # return features_combined
         smi_list = [agent_record.smiles for agent_record in agent_records]
         merged_smi = ".".join(smi_list)
         mol = Chem.MolFromSmiles(merged_smi)
 
         fp_arr = np.zeros((2048,), dtype=bool)
         if mol is not None and mol.GetNumHeavyAtoms() > 0:
-            # fp_arr = self.morgan_generator.GetFingerprint(mol)
             fp_arr = rdMolDescriptors.GetMorganFingerprintAsBitVect(
                 mol, radius=self.fp_radius, nBits=self.fp_length
             )
@@ -666,20 +650,14 @@ class GNNBinnedAgentAmountOneShotDataset(Dataset):
         agent_standardizer: AgentStandardizer,
         agent_encoder: AgentEncoder,
         featurizer: CondensedGraphOfReactionFeaturizer,
-        bins: None | list[float] = None,
+        bins: list[float],
         **kwargs,
     ):
         self.agent_standardizer = agent_standardizer
         self.agent_encoder = agent_encoder
         self.featurizer = featurizer
 
-        if bins is None:
-            small_bins = np.array([0, 0.075, 0.15, 0.25, 0.55, 0.95])
-            regular_bins = np.array([1.25, 1.75, 2.25, 2.75, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5])
-            large_bins = np.array([15.5, 25.5, 35.5, 45.5, 55.5, 65.5, 75.5, 85.5, 100.5])
-            bins = np.concatenate([small_bins, regular_bins, large_bins])
         self.bins = bins
-
         self.data = data
         super().__init__()
 

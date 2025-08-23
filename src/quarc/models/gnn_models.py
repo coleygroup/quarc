@@ -46,7 +46,7 @@ class BaseGNN(pl.LightningModule):
     ):
         super().__init__()
 
-        self.save_hyperparameters(ignore=["message_passing", "agg", "predictor"])
+        self.save_hyperparameters(ignore=["message_passing", "agg", "predictor", "metrics", "X_d_transform"])
         self.hparams.update(
             {
                 "message_passing": message_passing.hparams,

@@ -213,9 +213,9 @@ python scripts/train.py \
     ...
 ```
 
+Details of training parameters can be found in `src/quarc/cli/quarc_parser.py`. For binned classification tasks, custom binning can be specified using the `--binning-path` argument. Example binning configs can be found in `configs/binning_config.yaml`.
+
 For stage 1 agent prediction, the tensorboard logger only keeps track of the greedy search accuracy. You may want to perform offline [beam search](src/quarc/models/search.py#L96) evaluation to select the best checkpoint.
-
-
 
 ### Step 4/5: Create Pipeline Config
 

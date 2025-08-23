@@ -11,24 +11,21 @@ cfg = load_settings()
 class BinningConfig:
     """Configuration for binning across all stages."""
 
-    temperature_bins: np.ndarray
-    reactant_amount_bins: np.ndarray
-    agent_amount_bins: np.ndarray
+    temperature_bins: list[float]
+    reactant_amount_bins: list[float]
+    agent_amount_bins: list[float]
 
     @classmethod
     def default(cls):
         """Default binning configuration matching current setup."""
-        temperature_bins = np.arange(-100, 201, 10) + 273.15
-        reactant_amount_bins = np.array(
-            [0.95, 1.05, 1.15, 1.25, 1.35, 1.45, 1.75, 2.25, 2.75, 3.5, 4.5, 5.5, 6.5, 7.5]
-        )
+        temperature_bins = [x + 273.15 for x in range(-100, 201, 10)]
+        reactant_amount_bins = [0.95, 1.05, 1.15, 1.25, 1.35, 1.45, 1.75, 2.25, 2.75, 3.5, 4.5, 5.5, 6.5, 7.5]
 
-        substoichiometric = np.array([0, 0.075, 0.15, 0.25, 0.55, 0.95])
-        stoichiometric = np.array([1.25, 1.75, 2.25, 2.75, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5])
-        superstoichiometric = np.array([15.5, 25.5, 35.5, 45.5, 55.5, 65.5, 75.5, 85.5, 100.5])
-        agent_amount_bins = np.concatenate(
-            [substoichiometric, stoichiometric, superstoichiometric]
-        )
+
+        substoichiometric = [0, 0.075, 0.15, 0.25, 0.55, 0.95]
+        stoichiometric = [1.25, 1.75, 2.25, 2.75, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5]
+        superstoichiometric = [15.5, 25.5, 35.5, 45.5, 55.5, 65.5, 75.5, 85.5, 100.5]
+        agent_amount_bins = substoichiometric + stoichiometric + superstoichiometric
 
         return cls(temperature_bins, reactant_amount_bins, agent_amount_bins)
 
@@ -38,15 +35,12 @@ class BinningConfig:
             config = yaml.safe_load(f)
         binning_config = config["binning"]
 
-        temperature_bins = np.array(binning_config["temperature"]["bins"])
-        reactant_amount_bins = np.array(binning_config["reactant_amount"]["bins"])
-        agent_amount_bins = np.concatenate(
-            [
-                binning_config["agent_amount"]["substoichiometric"],
-                binning_config["agent_amount"]["stoichiometric"],
-                binning_config["agent_amount"]["superstoichiometric"],
-            ]
-        )
+        temperature_bins = list(binning_config["temperature"]["bins"])
+        reactant_amount_bins = list(binning_config["reactant_amount"]["bins"])
+        substoichiometric = list(binning_config["agent_amount"]["substoichiometric"])
+        stoichiometric = list(binning_config["agent_amount"]["stoichiometric"])
+        superstoichiometric = list(binning_config["agent_amount"]["superstoichiometric"])
+        agent_amount_bins = substoichiometric + stoichiometric + superstoichiometric
 
         return cls(temperature_bins, reactant_amount_bins, agent_amount_bins)
 

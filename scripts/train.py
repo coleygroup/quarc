@@ -14,7 +14,7 @@ from lightning.pytorch.callbacks.model_checkpoint import ModelCheckpoint
 from lightning.pytorch.utilities.rank_zero import rank_zero_only
 from loguru import logger
 
-from quarc.cli.quarc_parser import add_model_opts, add_train_opts, add_data_opts
+from quarc.cli.quarc_parser import add_model_opts, add_train_opts
 from quarc.training.model_factory import ModelFactory
 from quarc.settings import load as load_settings
 
@@ -207,7 +207,7 @@ def main():
         log_dir = cfg.logs_dir / "train" / args.model_type / f"stage{args.stage}"
         log_dir.mkdir(parents=True, exist_ok=True)
 
-        log_file = log_dir / f"{args.logger_name}_{datetime.now().strftime("%y%m%d_%H%M")}.log"
+        log_file = log_dir / f"{args.logger_name}_{datetime.now().strftime('%y%m%d_%H%M')}.log"
 
         logger.remove()
         logger.add(sys.stderr, level="INFO", colorize=True)

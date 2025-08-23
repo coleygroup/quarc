@@ -810,7 +810,7 @@ class ModelFactory:
         agg = chemprop.nn.MeanAggregation()
 
         predictor = GNNAgentAmountHead(
-            graph_dim=self.args.graph_hidden_size,
+            graph_input_dim=self.args.graph_hidden_size,
             agent_input_dim=len(self.agent_encoder),
             output_dim=self.args.output_size,
             hidden_dim=self.args.hidden_size,

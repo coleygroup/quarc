@@ -97,7 +97,7 @@ def load_encoders(cfg):
     )
     rxn_encoder = ReactionClassEncoder(class_path=cfg.pistachio_namerxn_path)
     featurizer = CondensedGraphOfReactionFeaturizer(mode_="REAC_DIFF")
-    return agent_encoder, agent_standardizer, rxn_encoder, featurizer, binning_config
+    return agent_encoder, agent_standardizer, rxn_encoder, featurizer
 
 
 def load_data(input_path: str) -> list[ReactionDatum]:
